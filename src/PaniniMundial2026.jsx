@@ -825,6 +825,7 @@ function TeamCard({ team, onClick }) {
 // VISTA DE SECCIÓN (equipos y especiales)
 // ============================================
 function SectionView({ section, collection, setSticker, onBack, filter, setFilter }) {
+  const ownedCount = section.stickers.filter((s) => (collection[s.id] || 0) >= 1).length;
   const filtered = section.stickers.filter((s) => {
     const qty = collection[s.id] || 0;
     if (filter === 'missing') return qty === 0;
@@ -854,7 +855,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
             {section.name}
           </h2>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--fg-muted)', marginTop: 4 }}>
-            {section.owned} / {section.total} · {Math.round((section.owned / section.total) * 100)}% completo
+            {ownedCount} / {section.total} · {Math.round((ownedCount / section.total) * 100)}% completo
           </div>
           {section.confed && (
             <div style={{ fontSize: 10, color: 'var(--accent-3)', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: 4, fontWeight: 700 }}>
@@ -868,8 +869,8 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         {[
           { code: 'all', label: 'Todas', count: section.total },
-          { code: 'missing', label: 'Faltan', count: section.total - section.owned },
-          { code: 'owned', label: 'Pegadas', count: section.owned },
+          { code: 'missing', label: 'Faltan', count: section.total - ownedCount },
+          { code: 'owned', label: 'Pegadas', count: ownedCount },
           { code: 'repeated', label: 'Repes', count: Object.entries(collection).filter(([id, q]) => q >= 2 && section.stickers.some((s) => s.id === id)).length },
         ].map((f) => (
           <button

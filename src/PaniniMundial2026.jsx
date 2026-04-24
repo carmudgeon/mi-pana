@@ -489,6 +489,8 @@ export default function PaniniMundial2026() {
             stats={stats}
             teamSections={filteredTeams}
             specialSections={specialSections}
+            collection={collection}
+            setSticker={setSticker}
             onSelectSection={(s) => { setSelectedSection(s); setView('section'); }}
             onViewRepes={() => setView('repes')}
             search={search} setSearch={setSearch}
@@ -541,7 +543,7 @@ function StatBadge({ label, value, color, icon }) {
   );
 }
 
-function HomeView({ stats, teamSections, specialSections, onSelectSection, onViewRepes, search, setSearch, confedFilter, setConfedFilter }) {
+function HomeView({ stats, teamSections, specialSections, collection, setSticker, onSelectSection, onViewRepes, search, setSearch, confedFilter, setConfedFilter }) {
   const confederations = [
     { code: 'ALL', label: 'Todas', color: 'var(--fg)' },
     { code: 'CONMEBOL', label: 'Conmebol', color: 'var(--accent-3)' },
@@ -654,6 +656,44 @@ function HomeView({ stats, teamSections, specialSections, onSelectSection, onVie
           </button>
         ))}
       </div>
+
+      {/* MARCAR TODAS LAS SELECCIONES */}
+      {teamSections.length > 0 && (() => {
+        const allStickers = teamSections.flatMap((s) => s.stickers);
+        const allOwned = allStickers.every((s) => (collection[s.id] || 0) >= 1);
+        return (
+          <div style={{ marginBottom: 16 }}>
+            {!allOwned ? (
+              <button
+                className="panini-btn"
+                onClick={() => allStickers.forEach((s) => { if (!(collection[s.id] >= 1)) setSticker(s.id, 1); })}
+                style={{
+                  padding: '8px 16px', borderRadius: 8,
+                  background: 'var(--accent-2)', color: '#000',
+                  fontSize: 12, fontWeight: 700,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                <Check size={14} strokeWidth={3} /> Marcar todas las selecciones
+              </button>
+            ) : (
+              <button
+                className="panini-btn"
+                onClick={() => allStickers.forEach((s) => setSticker(s.id, 0))}
+                style={{
+                  padding: '8px 16px', borderRadius: 8,
+                  background: 'var(--bg-3)', color: 'var(--fg-muted)',
+                  border: '1px solid var(--border)',
+                  fontSize: 12, fontWeight: 700,
+                  display: 'flex', alignItems: 'center', gap: 6,
+                }}
+              >
+                <X size={14} /> Desmarcar todas las selecciones
+              </button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* GRID DE EQUIPOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>

@@ -420,13 +420,16 @@ export default function PaniniMundial2026() {
         .sticker-flip-container {
           perspective: 800px;
         }
+        @keyframes flipReveal {
+          from { transform: rotateY(0deg); }
+          to { transform: rotateY(180deg); }
+        }
         .sticker-flip-inner {
           position: relative;
-          transition: transform 600ms ease-in-out;
           transform-style: preserve-3d;
         }
         .sticker-flip-inner.flipping {
-          transform: rotateY(180deg);
+          animation: flipReveal 600ms ease-in-out forwards;
         }
         .sticker-face {
           backface-visibility: hidden;

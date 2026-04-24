@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Check, CheckCheck, Plus, Minus, Trophy, Users, Building2, Shield, X, BarChart3, Filter, Sparkles, ArrowLeft, Repeat, Star, Undo2 } from 'lucide-react';
 
 // ============================================
-// DATOS DEL ÁLBUM PANINI FIFA WORLD CUP 2026
+// DATOS DEL ÁLBUM FIFA WORLD CUP 2026
 // 980 láminas totales: 48 equipos x 20 + secciones especiales
 // ============================================
 
@@ -289,7 +289,7 @@ const usePersistentState = (key, defaultValue) => {
 // ============================================
 // COMPONENTE PRINCIPAL
 // ============================================
-export default function PaniniMundial2026() {
+export default function MiPanaMundial2026() {
   // collection[id] = cantidad (0 = no tiene, 1 = pegada, 2+ = repetidas)
   const [collection, setCollection] = usePersistentState('panini2026-collection', {});
   const [view, setView] = useState('home'); // home | team | section | repes
@@ -369,15 +369,15 @@ export default function PaniniMundial2026() {
         }
         * { box-sizing: border-box; }
         body { margin: 0; }
-        .panini-btn {
+        .mp-btn {
           cursor: pointer;
           border: none;
           transition: all 0.15s ease;
           font-family: var(--font-body);
           font-weight: 600;
         }
-        .panini-btn:hover { transform: translateY(-1px); }
-        .panini-btn:active { transform: translateY(0); }
+        .mp-btn:hover { transform: translateY(-1px); }
+        .mp-btn:active { transform: translateY(0); }
         .sticker-card {
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -461,7 +461,7 @@ export default function PaniniMundial2026() {
               <Trophy size={22} color="#000" strokeWidth={2.5} />
             </div>
             <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, lineHeight: 1, letterSpacing: '0.02em' }}>PANINI 26</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, lineHeight: 1, letterSpacing: '0.02em' }}>MI PANA 26</div>
               <div style={{ fontSize: 11, color: 'var(--fg-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginTop: 2 }}>Mundial USA · MEX · CAN</div>
             </div>
           </div>
@@ -517,7 +517,7 @@ export default function PaniniMundial2026() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '24px', color: 'var(--fg-muted)', fontSize: 12, borderTop: '1px solid var(--border)' }}>
-        Álbum oficial Panini FIFA World Cup 2026™ · 980 láminas · Tu colección se guarda automáticamente
+        Álbum FIFA World Cup 2026™ · 980 láminas · Tu colección se guarda automáticamente
       </footer>
     </div>
   );
@@ -642,7 +642,7 @@ function HomeView({ stats, teamSections, specialSections, collection, setSticker
         {confederations.map((c) => (
           <button
             key={c.code}
-            className="panini-btn"
+            className="mp-btn"
             onClick={() => setConfedFilter(c.code)}
             style={{
               padding: '8px 14px', borderRadius: 20,
@@ -691,7 +691,7 @@ function BigStat({ value, total, label, pct }) {
 function QuickAction({ icon, title, subtitle, onClick, accent }) {
   return (
     <button
-      className="panini-btn sticker-card"
+      className="mp-btn sticker-card"
       onClick={onClick}
       style={{
         padding: 16, borderRadius: 12, textAlign: 'left',
@@ -741,7 +741,7 @@ function SpecialSectionCard({ section, onClick }) {
   };
   return (
     <button
-      className="panini-btn sticker-card"
+      className="mp-btn sticker-card"
       onClick={onClick}
       style={{
         padding: 16, borderRadius: 12, textAlign: 'left',
@@ -796,7 +796,7 @@ function TeamCard({ team, collection, setSticker, onClick }) {
 
   return (
     <div
-      className="panini-btn sticker-card"
+      className="mp-btn sticker-card"
       onClick={onClick}
       style={{
         padding: 14, borderRadius: 12, textAlign: 'left',
@@ -857,7 +857,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
   return (
     <div className="fade-in">
       <button
-        className="panini-btn"
+        className="mp-btn"
         onClick={onBack}
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
@@ -889,7 +889,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {ownedCount < section.total ? (
           <button
-            className="panini-btn"
+            className="mp-btn"
             onClick={() => section.stickers.forEach((s) => { if (!(collection[s.id] >= 1)) setSticker(s.id, 1); })}
             style={{
               padding: '8px 16px', borderRadius: 8,
@@ -902,7 +902,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
           </button>
         ) : (
           <button
-            className="panini-btn"
+            className="mp-btn"
             onClick={() => section.stickers.forEach((s) => setSticker(s.id, 0))}
             style={{
               padding: '8px 16px', borderRadius: 8,
@@ -927,7 +927,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
         ].map((f) => (
           <button
             key={f.code}
-            className="panini-btn"
+            className="mp-btn"
             onClick={() => setFilter(f.code)}
             style={{
               padding: '6px 12px', borderRadius: 16,
@@ -1067,7 +1067,7 @@ function StickerCard({ sticker, qty, onChange }) {
               fontFamily: 'var(--font-display)', fontSize: 7, letterSpacing: '0.25em',
               color: 'rgba(77,124,255,0.3)', textTransform: 'uppercase', marginTop: 4,
             }}>
-              PANINI
+              MI PANA
             </div>
           </div>
           )}
@@ -1182,7 +1182,7 @@ function StickerCard({ sticker, qty, onChange }) {
       {/* CONTROLS (outside flip) */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6, padding: '0 2px' }}>
         <button
-          className="panini-btn"
+          className="mp-btn"
           onClick={() => onChange(Math.max(0, qty - 1))}
           disabled={qty === 0}
           style={{
@@ -1207,7 +1207,7 @@ function StickerCard({ sticker, qty, onChange }) {
         </div>
 
         <button
-          className="panini-btn"
+          className="mp-btn"
           onClick={() => onChange(qty + 1)}
           style={{
             width: 28, height: 28, borderRadius: 6,
@@ -1236,7 +1236,7 @@ function RepesView({ collection, setSticker, onBack }) {
   return (
     <div className="fade-in">
       <button
-        className="panini-btn"
+        className="mp-btn"
         onClick={onBack}
         style={{
           display: 'flex', alignItems: 'center', gap: 6,
@@ -1302,7 +1302,7 @@ function RepesView({ collection, setSticker, onBack }) {
               </div>
               <div style={{ display: 'flex', gap: 6, marginTop: 'auto' }}>
                 <button
-                  className="panini-btn"
+                  className="mp-btn"
                   onClick={() => setSticker(s.id, s.qty - 1)}
                   style={{
                     flex: 1, padding: '6px', borderRadius: 6,

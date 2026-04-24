@@ -657,48 +657,10 @@ function HomeView({ stats, teamSections, specialSections, collection, setSticker
         ))}
       </div>
 
-      {/* MARCAR TODAS LAS SELECCIONES */}
-      {teamSections.length > 0 && (() => {
-        const allStickers = teamSections.flatMap((s) => s.stickers);
-        const allOwned = allStickers.every((s) => (collection[s.id] || 0) >= 1);
-        return (
-          <div style={{ marginBottom: 16 }}>
-            {!allOwned ? (
-              <button
-                className="panini-btn"
-                onClick={() => allStickers.forEach((s) => { if (!(collection[s.id] >= 1)) setSticker(s.id, 1); })}
-                style={{
-                  padding: '8px 16px', borderRadius: 8,
-                  background: 'var(--accent-2)', color: '#000',
-                  fontSize: 12, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}
-              >
-                <Check size={14} strokeWidth={3} /> Marcar todas las selecciones
-              </button>
-            ) : (
-              <button
-                className="panini-btn"
-                onClick={() => allStickers.forEach((s) => setSticker(s.id, 0))}
-                style={{
-                  padding: '8px 16px', borderRadius: 8,
-                  background: 'var(--bg-3)', color: 'var(--fg-muted)',
-                  border: '1px solid var(--border)',
-                  fontSize: 12, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', gap: 6,
-                }}
-              >
-                <X size={14} /> Desmarcar todas las selecciones
-              </button>
-            )}
-          </div>
-        );
-      })()}
-
       {/* GRID DE EQUIPOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
         {teamSections.map((team) => (
-          <TeamCard key={team.name} team={team} onClick={() => onSelectSection(team)} />
+          <TeamCard key={team.name} team={team} collection={collection} setSticker={setSticker} onClick={() => onSelectSection(team)} />
         ))}
       </div>
       {teamSections.length === 0 && (
@@ -810,9 +772,10 @@ function SpecialSectionCard({ section, onClick }) {
   );
 }
 
-function TeamCard({ team, onClick }) {
-  const pct = Math.round((team.owned / team.total) * 100);
-  const complete = team.owned === team.total;
+function TeamCard({ team, collection, setSticker, onClick }) {
+  const ownedCount = team.stickers.filter((s) => (collection[s.id] || 0) >= 1).length;
+  const pct = Math.round((ownedCount / team.total) * 100);
+  const complete = ownedCount === team.total;
   const confedColors = {
     CONMEBOL: 'var(--accent-3)',
     UEFA: 'var(--accent-4)',
@@ -821,8 +784,18 @@ function TeamCard({ team, onClick }) {
     AFC: '#c084fc',
     OFC: '#60a5fa',
   };
+
+  const handleToggleAll = (e) => {
+    e.stopPropagation();
+    if (complete) {
+      team.stickers.forEach((s) => setSticker(s.id, 0));
+    } else {
+      team.stickers.forEach((s) => { if (!(collection[s.id] >= 1)) setSticker(s.id, 1); });
+    }
+  };
+
   return (
-    <button
+    <div
       className="panini-btn sticker-card"
       onClick={onClick}
       style={{
@@ -830,25 +803,32 @@ function TeamCard({ team, onClick }) {
         background: complete ? 'linear-gradient(135deg, rgba(0,217,167,0.2) 0%, var(--bg-2) 100%)' : 'var(--bg-2)',
         border: `1px solid ${complete ? 'var(--accent-2)' : 'var(--border)'}`,
         color: 'var(--fg)', position: 'relative', overflow: 'hidden',
+        cursor: 'pointer',
       }}
     >
-      {complete && (
-        <div style={{
-          position: 'absolute', top: 8, right: 8,
-          background: 'var(--accent-2)', color: '#000',
-          borderRadius: '50%', width: 20, height: 20,
+      {/* BOTÓN MARCAR/DESMARCAR */}
+      <div
+        onClick={handleToggleAll}
+        title={complete ? 'Desmarcar todas' : 'Marcar todas'}
+        style={{
+          position: 'absolute', top: 8, right: 8, zIndex: 2,
+          background: complete ? 'var(--accent-2)' : 'var(--bg-3)',
+          color: complete ? '#000' : 'var(--fg-muted)',
+          borderRadius: '50%', width: 22, height: 22,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <Check size={12} strokeWidth={3} />
-        </div>
-      )}
+          border: complete ? 'none' : '1px solid var(--border)',
+          transition: 'all 0.15s ease',
+        }}
+      >
+        {complete ? <Check size={12} strokeWidth={3} /> : <Plus size={12} strokeWidth={2} />}
+      </div>
       <div style={{ fontSize: 32, lineHeight: 1, marginBottom: 8 }}>{team.flag}</div>
       <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4, lineHeight: 1.2 }}>{team.name}</div>
       <div style={{ fontSize: 9, color: confedColors[team.confed], textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, marginBottom: 8 }}>
         {team.confed}
       </div>
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--fg-muted)', marginBottom: 6 }}>
-        {team.owned}/{team.total}
+        {ownedCount}/{team.total}
       </div>
       <div style={{ height: 3, background: 'var(--bg-3)', borderRadius: 2, overflow: 'hidden' }}>
         <div style={{
@@ -857,7 +837,7 @@ function TeamCard({ team, onClick }) {
           transition: 'width 0.3s',
         }} />
       </div>
-    </button>
+    </div>
   );
 }
 

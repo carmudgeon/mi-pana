@@ -865,6 +865,38 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
         </div>
       </div>
 
+      {/* MARCAR TODAS / DESMARCAR */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        {ownedCount < section.total ? (
+          <button
+            className="panini-btn"
+            onClick={() => section.stickers.forEach((s) => { if (!(collection[s.id] >= 1)) setSticker(s.id, 1); })}
+            style={{
+              padding: '8px 16px', borderRadius: 8,
+              background: 'var(--accent-2)', color: '#000',
+              fontSize: 12, fontWeight: 700,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <Check size={14} strokeWidth={3} /> Marcar todas
+          </button>
+        ) : (
+          <button
+            className="panini-btn"
+            onClick={() => section.stickers.forEach((s) => setSticker(s.id, 0))}
+            style={{
+              padding: '8px 16px', borderRadius: 8,
+              background: 'var(--bg-3)', color: 'var(--fg-muted)',
+              border: '1px solid var(--border)',
+              fontSize: 12, fontWeight: 700,
+              display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <X size={14} /> Desmarcar todas
+          </button>
+        )}
+      </div>
+
       {/* FILTROS */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         {[

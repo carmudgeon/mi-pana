@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Check, Plus, Minus, Trophy, Users, Building2, Shield, X, BarChart3, Filter, Sparkles, ArrowLeft, Repeat, Star } from 'lucide-react';
+import { Search, Check, CheckCheck, Plus, Minus, Trophy, Users, Building2, Shield, X, BarChart3, Filter, Sparkles, ArrowLeft, Repeat, Star, Undo2 } from 'lucide-react';
 
 // ============================================
 // DATOS DEL ÁLBUM PANINI FIFA WORLD CUP 2026
@@ -820,7 +820,7 @@ function TeamCard({ team, collection, setSticker, onClick }) {
           transition: 'all 0.15s ease',
         }}
       >
-        {complete ? <Check size={12} strokeWidth={3} /> : <Plus size={12} strokeWidth={2} />}
+        {complete ? <Undo2 size={12} strokeWidth={2.5} /> : <CheckCheck size={12} strokeWidth={2.5} />}
       </div>
       <div style={{ fontSize: 32, lineHeight: 1, marginBottom: 8 }}>{team.flag}</div>
       <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 4, lineHeight: 1.2 }}>{team.name}</div>
@@ -898,7 +898,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
               display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
-            <Check size={14} strokeWidth={3} /> Marcar todas
+            <CheckCheck size={14} strokeWidth={2.5} /> Marcar todas
           </button>
         ) : (
           <button
@@ -912,7 +912,7 @@ function SectionView({ section, collection, setSticker, onBack, filter, setFilte
               display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
-            <X size={14} /> Desmarcar todas
+            <Undo2 size={14} /> Desmarcar todas
           </button>
         )}
       </div>

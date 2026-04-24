@@ -11,8 +11,8 @@ const TEAMS = [
   { code: 'CAN', name: 'Canadá', flag: '🇨🇦', confed: 'CONCACAF', group: 'B' },
   { code: 'MEX', name: 'México', flag: '🇲🇽', confed: 'CONCACAF', group: 'A' },
   { code: 'USA', name: 'Estados Unidos', flag: '🇺🇸', confed: 'CONCACAF', group: 'D' },
-  { code: 'JAM', name: 'Jamaica', flag: '🇯🇲', confed: 'CONCACAF', group: 'F' },
-  { code: 'CRC', name: 'Costa Rica', flag: '🇨🇷', confed: 'CONCACAF', group: 'E' },
+  { code: 'CUW', name: 'Curazao', flag: '🇨🇼', confed: 'CONCACAF', group: 'F' },
+  { code: 'HAI', name: 'Haití', flag: '🇭🇹', confed: 'CONCACAF', group: 'E' },
   { code: 'PAN', name: 'Panamá', flag: '🇵🇦', confed: 'CONCACAF', group: 'I' },
   // CONMEBOL (6)
   { code: 'ARG', name: 'Argentina', flag: '🇦🇷', confed: 'CONMEBOL', group: 'C' },
@@ -38,7 +38,7 @@ const TEAMS = [
   { code: 'SWE', name: 'Suecia', flag: '🇸🇪', confed: 'UEFA', group: 'B' },
   { code: 'TUR', name: 'Turquía', flag: '🇹🇷', confed: 'UEFA', group: 'C' },
   { code: 'CZE', name: 'Chequia', flag: '🇨🇿', confed: 'UEFA', group: 'D' },
-  // CAF (9)
+  // CAF (10)
   { code: 'ALG', name: 'Argelia', flag: '🇩🇿', confed: 'CAF', group: 'E' },
   { code: 'CPV', name: 'Cabo Verde', flag: '🇨🇻', confed: 'CAF', group: 'F' },
   { code: 'EGY', name: 'Egipto', flag: '🇪🇬', confed: 'CAF', group: 'G' },
@@ -68,8 +68,8 @@ const TEAM_COLORS = {
   CAN: { primary: '#FF0000', secondary: '#FFFFFF' },
   MEX: { primary: '#006847', secondary: '#CE1126' },
   USA: { primary: '#002868', secondary: '#BF0A30' },
-  JAM: { primary: '#009B3A', secondary: '#FED100' },
-  CRC: { primary: '#002B7F', secondary: '#CE1126' },
+  CUW: { primary: '#002B7F', secondary: '#F9E814' },
+  HAI: { primary: '#00209F', secondary: '#D21034' },
   PAN: { primary: '#DA121A', secondary: '#003DA5' },
   ARG: { primary: '#75AADB', secondary: '#FFFFFF' },
   BRA: { primary: '#CAAB2D', secondary: '#009739' },

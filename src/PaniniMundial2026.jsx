@@ -947,12 +947,13 @@ function StickerCard({ sticker, qty, onChange }) {
           style={{ minHeight: 160, position: 'relative' }}
         >
           {/* === BACK FACE: "En el sobre" === */}
+          {(!owned || justRevealed) && (
           <div
-            className="sticker-face sticker-back"
+            className={justRevealed ? 'sticker-face sticker-back' : undefined}
             style={{
-              position: justRevealed ? 'absolute' : (owned ? 'absolute' : 'relative'),
-              inset: 0,
-              display: owned && !justRevealed ? 'none' : 'flex',
+              position: justRevealed ? 'absolute' : 'relative',
+              inset: justRevealed ? 0 : undefined,
+              display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
@@ -998,14 +999,16 @@ function StickerCard({ sticker, qty, onChange }) {
               PANINI
             </div>
           </div>
+          )}
 
           {/* === FRONT FACE: Revealed sticker === */}
+          {(owned || justRevealed) && (
           <div
-            className="sticker-face sticker-front"
+            className={justRevealed ? 'sticker-face sticker-front' : undefined}
             style={{
-              position: justRevealed ? 'absolute' : (!owned ? 'absolute' : 'relative'),
-              inset: 0,
-              display: !owned && !justRevealed ? 'none' : 'flex',
+              position: justRevealed ? 'absolute' : 'relative',
+              inset: justRevealed ? 0 : undefined,
+              display: 'flex',
               flexDirection: 'column',
               minHeight: 160,
               borderRadius: 10,
@@ -1101,6 +1104,7 @@ function StickerCard({ sticker, qty, onChange }) {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
 

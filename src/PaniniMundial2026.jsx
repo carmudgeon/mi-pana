@@ -943,7 +943,22 @@ function StickerCard({ sticker, qty, onChange }) {
   };
 
   return (
-    <div className="sticker-card" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <div className="sticker-card" style={{ display: 'flex', flexDirection: 'column', gap: 8, position: 'relative' }}>
+      {/* BADGE DE REPETIDAS */}
+      {repeated && (
+        <div style={{
+          position: 'absolute', top: -6, right: -6, zIndex: 10,
+          minWidth: 20, height: 20, borderRadius: 10,
+          background: '#ff2d55',
+          color: '#fff',
+          fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: 11,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 5px',
+          boxShadow: '0 2px 6px rgba(255,45,85,0.5)',
+        }}>
+          {qty - 1}
+        </div>
+      )}
       {/* FLIP CONTAINER */}
       <div className="sticker-flip-container" style={{ borderRadius: 10, overflow: 'hidden' }}>
         <div

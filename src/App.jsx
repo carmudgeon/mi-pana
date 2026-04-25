@@ -1,5 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
+import usePersistentState from './hooks/usePersistentState.js';
+import AlbumOverviewScreen from './screens/AlbumOverviewScreen.jsx';
+import TeamDetailScreen from './screens/TeamDetailScreen.jsx';
+import TradeMatchesScreen from './screens/TradeMatchesScreen.jsx';
 
 export default function App() {
-  return <div className="screen" style={{ padding: 16 }}>Mi Pana 26 — redesign in progress</div>;
+  const [collection, setCollection] = usePersistentState('panini2026-collection', {});
+  const [view, setView] = useState('home');
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const lang = 'es';
+  const userName = 'Diego';
+
+  const setSticker = (id, qty) => {
+    setCollection(prev => {
+      const next = { ...prev };
+      if (qty <= 0) delete next[id];
+      else next[id] = qty;
+      return next;
+    });
+  };
+
+  const handleNavigate = (tab) => {
+    if (tab === 'home' || tab === 'teams') { setView('home'); setSelectedTeam(null); }
+    else if (tab === 'trade') setView('trade');
+  };
+
+  const handleSelectTeam = (team) => {
+    setSelectedTeam(team);
+    setView('team');
+  };
+
+  if (view === 'team' && selectedTeam) {
+    return (
+      <TeamDetailScreen team={selectedTeam} collection={collection} setSticker={setSticker}
+        lang={lang} onBack={() => { setView('home'); setSelectedTeam(null); }} onNavigate={handleNavigate} />
+    );
+  }
+
+  if (view === 'trade') {
+    return <TradeMatchesScreen lang={lang} onNavigate={handleNavigate} />;
+  }
+
+  return (
+    <AlbumOverviewScreen collection={collection} lang={lang} userName={userName}
+      onSelectTeam={handleSelectTeam} onNavigate={handleNavigate} />
+  );
 }

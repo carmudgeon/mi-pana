@@ -1,0 +1,66 @@
+.sticker {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--r-sticker);
+  background: #fff;
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.sticker-top {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+.sticker-silhouette {
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 6px 14px -6px rgba(0,0,0,0.4);
+}
+.sticker-silhouette::before {
+  content: "";
+  display: block;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(0,0,0,0.25);
+  margin: 8px auto 0;
+}
+.sticker-num {
+  position: absolute; top: 6px; left: 6px;
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  padding: 2px 5px; border-radius: 5px;
+}
+.sticker-name {
+  padding: 5px 6px 6px;
+  font-size: 10px; font-weight: 700;
+  text-align: center; line-height: 1.15;
+  letter-spacing: -0.005em;
+  border-top: 1px solid var(--line);
+}
+.sticker-owned-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--c-yellow);
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.sticker-dup-badge {
+  position: absolute; bottom: 30px; right: 6px;
+  background: var(--c-magenta); color: #fff;
+  font-family: var(--font-mono);
+  font-size: 9px; font-weight: 700;
+  padding: 2px 5px; border-radius: 5px;
+  letter-spacing: 0.04em;
+}
+.sticker.owned .sticker-num { background: var(--c-yellow); color: var(--ink); }
+.sticker.owned .sticker-name { background: #fff; }
+.sticker.miss .sticker-top { background: var(--paper-2) !important; }
+.sticker.miss .sticker-silhouette { background: rgba(13,16,36,0.10); box-shadow: none; }
+.sticker.miss .sticker-silhouette::before { background: rgba(13,16,36,0.18); }
+.sticker.miss .sticker-name { color: var(--muted); }
+.sticker.miss .sticker-num { background: rgba(13,16,36,0.06); color: var(--muted); }
+.sticker.add { border-style: dashed; border-color: var(--line-strong); background: transparent; }
+.sticker.add .sticker-top { background: transparent !important; }
+.sticker.add .sticker-name { color: var(--muted); border-top: 1px dashed var(--line-strong); }
+.sticker-plus { font-size: 28px; font-weight: 300; color: var(--muted); }

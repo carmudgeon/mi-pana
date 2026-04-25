@@ -1,0 +1,21 @@
+.team-row {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--r-card);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  position: relative; overflow: hidden; cursor: pointer;
+  box-shadow: var(--shadow-card);
+}
+.team-row-meta { flex: 1; min-width: 0; }
+.team-row-name { font-weight: 800; font-size: 14px; letter-spacing: -0.005em; }
+.team-row-sub {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--muted);
+  margin-top: 2px; letter-spacing: 0.02em;
+}
+.team-row-bar {
+  width: 64px; height: 6px; border-radius: var(--r-pill);
+  background: rgba(11,14,19,0.06); overflow: hidden; margin-top: 4px;
+}
+.team-row-bar-fill { display: block; height: 100%; border-radius: var(--r-pill); }
+.team-row-pct {
+  font-family: var(--font-display); font-weight: 800; font-size: 18px; letter-spacing: -0.01em;
+}
+.team-row-pct-sign { font-size: 11px; color: var(--muted); }

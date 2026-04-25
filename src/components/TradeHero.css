@@ -1,0 +1,27 @@
+.trade-hero {
+  margin: 8px var(--screen-margin) 12px; border-radius: var(--r-trade-hero);
+  padding: var(--sp-8);
+  background:
+    radial-gradient(circle at 100% 0%, var(--c-yellow) 0 110px, transparent 110px),
+    radial-gradient(circle at 100% 100%, var(--c-orange) 0 90px, transparent 90px),
+    radial-gradient(circle at 0% 100%, var(--c-magenta) 0 90px, transparent 90px),
+    linear-gradient(150deg, var(--c-violet) 0%, var(--c-blue) 50%, var(--c-teal) 100%);
+  color: #fff; position: relative; overflow: hidden;
+  box-shadow: var(--shadow-hero);
+}
+.trade-hero > * { position: relative; z-index: 1; }
+.trade-hero h3 {
+  margin: 0; font-family: var(--font-display); font-size: 22px;
+  font-weight: 900; letter-spacing: -0.01em; max-width: 75%;
+}
+.trade-hero p {
+  margin: 4px 0 0; font-size: 12px; color: rgba(255,255,255,0.7);
+  line-height: 1.4; max-width: 78%;
+}
+.trade-hero-pill {
+  margin-top: 12px; display: inline-flex; align-items: center; gap: 6px;
+  background: var(--c-yellow); color: #0B0E13;
+  font-weight: 800; font-size: 12px; padding: 8px 12px;
+  border-radius: var(--r-pill); border: none; cursor: pointer;
+  font-family: var(--font-body);
+}

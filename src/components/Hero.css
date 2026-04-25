@@ -1,0 +1,53 @@
+.hero {
+  margin: 6px var(--screen-margin) 14px;
+  border-radius: var(--r-hero);
+  padding: var(--sp-8);
+  background:
+    radial-gradient(circle at 100% 0%, var(--c-yellow) 0 80px, transparent 80px),
+    radial-gradient(circle at 0% 100%, var(--c-magenta) 0 90px, transparent 90px),
+    radial-gradient(circle at 100% 100%, var(--c-orange) 0 70px, transparent 70px),
+    linear-gradient(150deg, var(--c-violet) 0%, var(--c-blue) 60%, var(--c-teal) 100%);
+  color: #fff;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-hero);
+}
+.hero::before {
+  content: ""; position: absolute; inset: auto -40px -50px auto;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: var(--c-red); mix-blend-mode: screen; opacity: 0.5; filter: blur(2px);
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-eyebrow {
+  font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+}
+.hero-title {
+  font-family: var(--font-display); font-weight: 800; font-size: 26px;
+  line-height: 1.05; margin-top: 6px; letter-spacing: -0.01em;
+}
+.hero-title em { font-style: normal; color: var(--c-yellow); }
+.hero-stats {
+  margin-top: 14px; display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 8px;
+}
+.hero-big {
+  font-family: var(--font-display); font-weight: 900; font-size: 48px;
+  line-height: 1; letter-spacing: -0.02em;
+}
+.hero-big small { font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.5); margin-left: 4px; }
+.hero-right {
+  text-align: right; font-size: 11px; color: rgba(255,255,255,0.7); font-family: var(--font-mono);
+}
+.hero-right b {
+  display: block; color: #fff; font-family: var(--font-body); font-size: 18px; font-weight: 800;
+}
+.hero-progress {
+  margin-top: 14px; height: 8px; border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.12); overflow: hidden;
+}
+.hero-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-yellow), var(--c-orange) 45%, var(--c-magenta) 80%, var(--c-violet));
+  border-radius: var(--r-pill); transition: width 400ms ease-out;
+}

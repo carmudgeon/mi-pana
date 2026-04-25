@@ -1,9 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import MiPanaMundial2026 from './PaniniMundial2026.jsx'
+import './tokens.css'
+import './global.css'
+import App from './App.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <MiPanaMundial2026 />
+    <App />
   </React.StrictMode>,
 )

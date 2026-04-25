@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Archivo+Narrow:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+/* Full-screen container with mosaic radial-gradient background */
+.screen {
+  min-height: 100vh;
+  position: relative;
+}
+
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 15%, var(--c-blue) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 85% 10%, var(--c-violet) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 40% at 90% 60%, var(--c-teal) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 35% at 5% 80%, var(--c-green) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 50% 95%, var(--c-orange) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, var(--c-magenta) 0%, transparent 70%);
+  opacity: 0.10;
+  z-index: 0;
+}
+
+.screen > * {
+  position: relative;
+  z-index: 1;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+}

@@ -65,6 +65,8 @@ const strings = {
     tradeDate: 'Propuesto el',
     deleteTrade: 'Rechazar',
     acceptTrade: 'Aceptar trueque',
+    fullGrid: 'Todos los cromos',
+    albumComplete: 'Álbum completo',
     proposeGiveOnly: 'Regalar cromos',
     proposeGetOnly: 'Pedir cromos',
   },
@@ -135,6 +137,8 @@ const strings = {
     deleteTrade: 'Reject',
     acceptTrade: 'Accept trade',
     proposeGiveOnly: 'Gift stickers',
+    fullGrid: 'All stickers',
+    albumComplete: 'Album complete',
     proposeGetOnly: 'Request stickers',
   },
 };

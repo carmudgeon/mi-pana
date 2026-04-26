@@ -3,6 +3,7 @@ import usePersistentState from './hooks/usePersistentState.js';
 import AlbumOverviewScreen from './screens/AlbumOverviewScreen.jsx';
 import TeamDetailScreen from './screens/TeamDetailScreen.jsx';
 import TradeMatchesScreen from './screens/TradeMatchesScreen.jsx';
+import FullGridScreen from './screens/FullGridScreen.jsx';
 
 export default function App() {
   const [collection, setCollection] = usePersistentState('panini2026-collection', {});
@@ -53,6 +54,7 @@ export default function App() {
   const handleNavigate = (tab) => {
     if (tab === 'home' || tab === 'teams') { setView('home'); setSelectedTeam(null); }
     else if (tab === 'trade') setView('trade');
+    else if (tab === 'grid') setView('grid');
   };
 
   const handleSelectTeam = (team) => {
@@ -65,6 +67,11 @@ export default function App() {
       <TeamDetailScreen team={selectedTeam} collection={collection} setSticker={setSticker}
         lang={lang} onBack={() => { setView('home'); setSelectedTeam(null); }} onNavigate={handleNavigate} />
     );
+  }
+
+  if (view === 'grid') {
+    return <FullGridScreen collection={collection} setSticker={setSticker}
+      lang={lang} onBack={() => setView('home')} onNavigate={handleNavigate} />;
   }
 
   if (view === 'trade') {

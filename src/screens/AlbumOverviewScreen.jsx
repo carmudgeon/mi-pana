@@ -89,7 +89,7 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
           });
         }} />
         <QuickAction glyph="⇄" label={t(lang, 'tradeAction')} color="var(--c-blue)" onClick={() => onNavigate?.('trade')} />
-        <QuickAction glyph="◐" label={t(lang, 'missingAction')} color="var(--c-green)" />
+        <QuickAction glyph="◐" label={t(lang, 'missingAction')} color="var(--c-green)" onClick={() => onNavigate?.('grid')} />
         <QuickAction glyph="⌘" label={t(lang, 'scanAction')} color="#0B0E13" onClick={() => onNavigate?.('trade')} />
       </div>
 

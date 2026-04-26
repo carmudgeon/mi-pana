@@ -8,10 +8,11 @@ export default function QrScanner({ collection, lang }) {
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [scanning, setScanning] = useState(false);
   const fileRef = useRef(null);
 
-  const handleAnalyze = (text) => {
-    const payload = (text || inputText).trim();
+  const runAnalysis = (text) => {
+    const payload = text.trim();
     setError(null);
     setResult(null);
 
@@ -25,28 +26,58 @@ export default function QrScanner({ collection, lang }) {
     setResult({ matches, mode: decoded.mode, total: decoded.stickers.length });
   };
 
+  const handleAnalyze = () => runAnalysis(inputText);
+
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setScanning(true);
+    setError(null);
+    setResult(null);
 
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxDim = 1024;
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          const scale = maxDim / Math.max(w, h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
 
-      if (code?.data) {
-        setInputText(code.data);
-        handleAnalyze(code.data);
-      } else {
+        try {
+          const imageData = ctx.getImageData(0, 0, w, h);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+          if (code?.data) {
+            setInputText(code.data);
+            runAnalysis(code.data);
+          } else {
+            setError(t(lang, 'invalidQr'));
+          }
+        } catch (err) {
+          setError(t(lang, 'invalidQr'));
+        }
+        setScanning(false);
+      };
+      img.onerror = () => {
         setError(t(lang, 'invalidQr'));
-      }
+        setScanning(false);
+      };
+      img.src = reader.result;
     };
-    img.src = URL.createObjectURL(file);
+    reader.readAsDataURL(file);
+
+    // Reset file input so the same file can be re-selected
+    e.target.value = '';
   };
 
   const groupByTeam = (ids) => {
@@ -77,22 +108,23 @@ export default function QrScanner({ collection, lang }) {
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-        <button onClick={() => handleAnalyze()} style={{
+        <button onClick={handleAnalyze} disabled={!inputText.trim()} style={{
           flex: 1, padding: 10, borderRadius: 'var(--r-button)',
-          background: 'var(--c-blue)', color: '#fff', border: 'none',
-          fontSize: 12, fontWeight: 800, cursor: 'pointer',
+          background: inputText.trim() ? 'var(--c-blue)' : 'rgba(13,16,36,0.08)',
+          color: inputText.trim() ? '#fff' : 'var(--muted)', border: 'none',
+          fontSize: 12, fontWeight: 800, cursor: inputText.trim() ? 'pointer' : 'not-allowed',
           fontFamily: 'var(--font-body)',
         }}>
           {t(lang, 'analyze')}
         </button>
-        <button onClick={() => fileRef.current?.click()} style={{
+        <button onClick={() => fileRef.current?.click()} disabled={scanning} style={{
           flex: 1, padding: 10, borderRadius: 'var(--r-button)',
           background: '#fff', color: 'var(--ink)',
           border: '1px solid var(--line-strong)',
           fontSize: 11, fontWeight: 700, cursor: 'pointer',
           fontFamily: 'var(--font-body)',
         }}>
-          {t(lang, 'uploadQr')}
+          {scanning ? '...' : t(lang, 'uploadQr')}
         </button>
         <input ref={fileRef} type="file" accept="image/*" onChange={handleFileUpload}
           style={{ display: 'none' }} />
@@ -112,14 +144,11 @@ export default function QrScanner({ collection, lang }) {
       {/* Results */}
       {result && (
         <div style={{ marginTop: 16 }}>
-          {/* Header */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: 12,
           }}>
-            <div style={{
-              fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16,
-            }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16 }}>
               {result.mode === 'D' ? t(lang, 'theyHaveYouNeed') : t(lang, 'youCanGive')}
             </div>
             <div style={{

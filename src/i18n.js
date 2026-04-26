@@ -55,6 +55,10 @@ const strings = {
     invalidQr: 'Código QR no válido',
     emptyList: 'No tienes cromos en esta categoría',
     qrDescription: 'Este QR contiene tus repetidos y faltantes. Quien lo escanee verá las coincidencias para proponer un trueque.',
+    myTrades: 'Mis trueques',
+    noTrades: 'Aún no tienes trueques. Escanea un QR para proponer uno.',
+    tradeDate: 'Propuesto el',
+    deleteTrade: 'Eliminar',
   },
   en: {
     greeting: 'Hey,',
@@ -112,6 +116,10 @@ const strings = {
     invalidQr: 'Invalid QR code',
     emptyList: 'No stickers in this category',
     qrDescription: 'This QR contains your duplicates and missing stickers. Anyone who scans it will see matches to propose a trade.',
+    myTrades: 'My trades',
+    noTrades: 'No trades yet. Scan a QR to propose one.',
+    tradeDate: 'Proposed on',
+    deleteTrade: 'Delete',
   },
 };
 

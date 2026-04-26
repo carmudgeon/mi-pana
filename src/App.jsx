@@ -7,9 +7,9 @@ import ScanScreen from './screens/ScanScreen.jsx';
 
 export default function App() {
   const [collection, setCollection] = usePersistentState('panini2026-collection', {});
+  const [trades, setTrades] = usePersistentState('panini2026-trades', []);
   const [view, setView] = useState('home');
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const [pendingTrade, setPendingTrade] = useState(null);
   const lang = 'es';
   const userName = 'Diego';
 
@@ -20,6 +20,21 @@ export default function App() {
       else next[id] = qty;
       return next;
     });
+  };
+
+  const addTrade = (proposal) => {
+    const trade = {
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      canGive: proposal.canGive,
+      canGet: proposal.canGet,
+    };
+    setTrades(prev => [trade, ...prev]);
+    setView('trade');
+  };
+
+  const removeTrade = (tradeId) => {
+    setTrades(prev => prev.filter(t => t.id !== tradeId));
   };
 
   const handleNavigate = (tab) => {
@@ -41,13 +56,13 @@ export default function App() {
   }
 
   if (view === 'trade') {
-    return <TradeMatchesScreen lang={lang} pendingTrade={pendingTrade}
-      onClearTrade={() => setPendingTrade(null)} onNavigate={handleNavigate} />;
+    return <TradeMatchesScreen lang={lang} trades={trades} onRemoveTrade={removeTrade}
+      onNavigate={handleNavigate} />;
   }
 
   if (view === 'scan') {
     return <ScanScreen collection={collection} lang={lang} onNavigate={handleNavigate}
-      onProposeTrade={(proposal) => { setPendingTrade(proposal); setView('trade'); }} />;
+      onProposeTrade={addTrade} />;
   }
 
   return (

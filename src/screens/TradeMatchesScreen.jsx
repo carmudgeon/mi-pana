@@ -1,37 +1,34 @@
 import React from 'react';
 import TradeHero from '../components/TradeHero.jsx';
-import MatchCard from '../components/MatchCard.jsx';
 import DealSide from '../components/DealSide.jsx';
 import TabBar from '../components/TabBar.jsx';
-import { MOCK_MATCHES } from '../data.js';
 import { t } from '../i18n.js';
 
-function PendingTradeCard({ trade, lang, onDismiss }) {
+function TradeCard({ trade, lang, onRemove }) {
+  const date = new Date(trade.createdAt);
+  const dateStr = date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+
   return (
     <div style={{
-      margin: '0 var(--screen-margin) 14px',
-      background: '#fff', border: '2px solid var(--c-green)',
+      margin: '0 var(--screen-margin) 12px',
+      background: '#fff', border: '1px solid var(--line)',
       borderRadius: 'var(--r-card)', padding: 14,
-      display: 'flex', flexDirection: 'column', gap: 12,
-      boxShadow: '0 4px 16px rgba(20,168,94,0.15)',
+      display: 'flex', flexDirection: 'column', gap: 10,
+      boxShadow: 'var(--shadow-card)',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{
-          fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14,
-          display: 'flex', alignItems: 'center', gap: 6,
+          fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)',
+          letterSpacing: '0.02em',
         }}>
-          <span style={{
-            background: 'var(--c-green)', color: '#fff',
-            padding: '2px 8px', borderRadius: 'var(--r-pill)',
-            fontFamily: 'var(--font-mono)', fontSize: 9, fontWeight: 700,
-            letterSpacing: '0.06em',
-          }}>NUEVO</span>
-          {t(lang, 'proposeTrade')}
+          {t(lang, 'tradeDate')} {dateStr}
         </div>
-        <button onClick={onDismiss} style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          color: 'var(--muted)', fontSize: 18, padding: 0, lineHeight: 1,
-        }}>×</button>
+        <div style={{
+          fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 16,
+          color: 'var(--c-green)',
+        }}>
+          {trade.canGive.length} ↔ {trade.canGet.length}
+        </div>
       </div>
 
       <div style={{
@@ -47,56 +44,53 @@ function PendingTradeCard({ trade, lang, onDismiss }) {
         <DealSide direction="get" chips={trade.canGet.map(id => id.split('-'))} ariaLabel={t(lang, 'inLabel')} />
       </div>
 
-      <div style={{
-        fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)',
-        textAlign: 'center',
+      <button onClick={() => onRemove(trade.id)} style={{
+        background: 'none', border: '1px solid var(--line)',
+        borderRadius: 'var(--r-button)', padding: '8px',
+        fontSize: 11, fontWeight: 700, color: 'var(--muted)',
+        cursor: 'pointer', fontFamily: 'var(--font-body)',
       }}>
-        {trade.canGive.length} ↓ · {trade.canGet.length} ↑
-      </div>
+        {t(lang, 'deleteTrade')}
+      </button>
     </div>
   );
 }
 
-export default function TradeMatchesScreen({ lang, pendingTrade, onClearTrade, onNavigate }) {
+export default function TradeMatchesScreen({ lang, trades, onRemoveTrade, onNavigate }) {
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <div style={{ padding: '8px 18px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div>
-          <b style={{ display: 'block', fontSize: 18, fontFamily: 'var(--font-display)' }}>{t(lang, 'tradeTitle')}</b>
-          <span style={{ color: 'var(--muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>{t(lang, 'nearbyCount', 12)}</span>
-        </div>
-        <div style={{
-          width: 38, height: 38, borderRadius: '50%', background: '#fff',
-          border: '1px solid var(--line)', display: 'grid', placeItems: 'center',
-        }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B0E13" strokeWidth="2.4" strokeLinecap="round">
-            <path d="M3 6h18M6 12h12M10 18h4"/>
-          </svg>
-        </div>
+      <div style={{ padding: '8px 18px 12px' }}>
+        <b style={{ display: 'block', fontSize: 18, fontFamily: 'var(--font-display)' }}>{t(lang, 'tradeTitle')}</b>
+        <span style={{ color: 'var(--muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>
+          {trades.length > 0 ? `${trades.length} ${trades.length === 1 ? 'trueque' : 'trueques'}` : ''}
+        </span>
       </div>
 
-      {/* Pending trade from QR scan */}
-      {pendingTrade && (
-        <PendingTradeCard trade={pendingTrade} lang={lang} onDismiss={onClearTrade} />
-      )}
-
       <TradeHero title={t(lang, 'tradeHeroTitle')} body={t(lang, 'tradeHeroBody', 47, 23)}
-        ctaLabel={t(lang, 'findMatch')} onCtaClick={() => { /* TODO: match search modal */ }} />
+        ctaLabel={t(lang, 'findMatch')} onCtaClick={() => onNavigate?.('scan')} />
 
-      <div style={{ margin: '6px 18px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ margin: '6px 18px 12px' }}>
         <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, letterSpacing: '-0.005em' }}>
-          {t(lang, 'bestMatches')}
+          {t(lang, 'myTrades')}
         </h3>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.14em',
-          textTransform: 'uppercase', color: 'var(--muted)' }}>{t(lang, 'filter')}</div>
       </div>
 
       <div style={{ flex: 1 }}>
-        {MOCK_MATCHES.map((m, i) => (
-          <MatchCard key={i} match={m} proposeLabel={t(lang, 'proposeTrade')}
-            chatLabel={t(lang, 'chat')} outLabel={t(lang, 'outLabel')}
-            inLabel={t(lang, 'inLabel')} cardsLabel={t(lang, 'cards')} />
-        ))}
+        {trades.length === 0 ? (
+          <div style={{
+            margin: '0 var(--screen-margin)',
+            textAlign: 'center', padding: 40, color: 'var(--muted)',
+            fontSize: 13, background: 'rgba(13,16,36,0.03)',
+            borderRadius: 'var(--r-card)', border: '1px dashed var(--line-strong)',
+            lineHeight: 1.5,
+          }}>
+            {t(lang, 'noTrades')}
+          </div>
+        ) : (
+          trades.map(trade => (
+            <TradeCard key={trade.id} trade={trade} lang={lang} onRemove={onRemoveTrade} />
+          ))
+        )}
       </div>
 
       <TabBar active="trade" onNavigate={onNavigate} />

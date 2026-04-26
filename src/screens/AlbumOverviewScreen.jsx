@@ -86,13 +86,10 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
         <QuickAction glyph="⌘" label={t(lang, 'scanAction')} color="#0B0E13" />
       </div>
 
-      <div style={{ margin: '18px 18px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ margin: '18px 18px 8px' }}>
         <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, letterSpacing: '-0.005em' }}>
-          {t(lang, 'teamsHeader')}
+          {t(lang, 'teamsHeader')} <span style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', fontWeight: 500, letterSpacing: '0.04em' }}>({filteredTeams.length})</span>
         </h3>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-          {t(lang, 'seeAll')} ({TEAMS.length})
-        </div>
       </div>
 
       {/* Search */}

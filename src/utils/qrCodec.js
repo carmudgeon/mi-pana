@@ -1,16 +1,59 @@
 import { TEAMS } from '../data.js';
 
 const PREFIX = 'MP26';
-const GROUPED_THRESHOLD = 2500;
+const STICKERS_PER_TEAM = 18;
+const TOTAL_BITS = TEAMS.length * STICKERS_PER_TEAM; // 864
 
 function allStickerIds() {
   const ids = [];
   for (const team of TEAMS) {
-    for (let i = 1; i <= 18; i++) {
+    for (let i = 1; i <= STICKERS_PER_TEAM; i++) {
       ids.push(`${team.code}-${String(i).padStart(2, '0')}`);
     }
   }
   return ids;
+}
+
+function idToBitIndex(id) {
+  const [code, numStr] = id.split('-');
+  const teamIdx = TEAMS.findIndex(t => t.code === code);
+  if (teamIdx === -1) return -1;
+  const num = parseInt(numStr, 10);
+  if (num < 1 || num > STICKERS_PER_TEAM) return -1;
+  return teamIdx * STICKERS_PER_TEAM + (num - 1);
+}
+
+function bitIndexToId(bitIdx) {
+  const teamIdx = Math.floor(bitIdx / STICKERS_PER_TEAM);
+  const num = (bitIdx % STICKERS_PER_TEAM) + 1;
+  return `${TEAMS[teamIdx].code}-${String(num).padStart(2, '0')}`;
+}
+
+function bitsToBase64(bits) {
+  const bytes = [];
+  for (let i = 0; i < bits.length; i += 8) {
+    let byte = 0;
+    for (let b = 0; b < 8 && i + b < bits.length; b++) {
+      if (bits[i + b]) byte |= (1 << (7 - b));
+    }
+    bytes.push(byte);
+  }
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function base64ToBits(b64, totalBits) {
+  const raw = atob(b64);
+  const bits = new Array(totalBits).fill(false);
+  for (let i = 0; i < raw.length; i++) {
+    const byte = raw.charCodeAt(i);
+    for (let b = 0; b < 8; b++) {
+      const idx = i * 8 + b;
+      if (idx < totalBits) {
+        bits[idx] = !!(byte & (1 << (7 - b)));
+      }
+    }
+  }
+  return bits;
 }
 
 export function encode(collection, mode) {
@@ -25,19 +68,13 @@ export function encode(collection, mode) {
 
   if (ids.length === 0) return null;
 
-  const flat = ids.map(id => id.replace('-', '')).join(',');
-  const payload = `${PREFIX}:${mode}:${flat}`;
-
-  if (payload.length <= GROUPED_THRESHOLD) return payload;
-
-  const grouped = {};
+  const bits = new Array(TOTAL_BITS).fill(false);
   for (const id of ids) {
-    const [team, num] = id.split('-');
-    if (!grouped[team]) grouped[team] = [];
-    grouped[team].push(num);
+    const idx = idToBitIndex(id);
+    if (idx >= 0) bits[idx] = true;
   }
-  const parts = Object.entries(grouped).map(([team, nums]) => `${team}:${nums.join('.')}`);
-  return `${PREFIX}:${mode}:${parts.join(',')}`;
+
+  return `${PREFIX}:${mode}:${bitsToBase64(bits)}`;
 }
 
 export function decode(payload) {
@@ -52,29 +89,17 @@ export function decode(payload) {
   const data = parts.slice(2).join(':');
   const stickers = [];
 
-  if (data.includes(':')) {
-    for (const chunk of data.split(',')) {
-      const [team, nums] = chunk.split(':');
-      if (!team || !nums) continue;
-      for (const num of nums.split('.')) {
-        stickers.push(`${team}-${num}`);
-      }
-    }
-  } else {
-    for (const raw of data.split(',')) {
-      if (raw.length < 4) continue;
-      const team = raw.slice(0, 3);
-      const num = raw.slice(3);
-      stickers.push(`${team}-${num}`);
-    }
+  const bits = base64ToBits(data, TOTAL_BITS);
+  for (let i = 0; i < TOTAL_BITS; i++) {
+    if (bits[i]) stickers.push(bitIndexToId(i));
   }
 
+  if (stickers.length === 0) return null;
   return { mode, stickers };
 }
 
 export function computeMatches(myCollection, theirStickers, theirMode) {
   const matches = [];
-
   for (const id of theirStickers) {
     if (theirMode === 'D') {
       if (!(myCollection[id] >= 1)) matches.push(id);
@@ -82,7 +107,6 @@ export function computeMatches(myCollection, theirStickers, theirMode) {
       if ((myCollection[id] || 0) >= 2) matches.push(id);
     }
   }
-
   return matches;
 }
 

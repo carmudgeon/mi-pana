@@ -33,7 +33,22 @@ export default function App() {
     setView('trade');
   };
 
-  const removeTrade = (tradeId) => {
+  const acceptTrade = (trade) => {
+    setCollection(prev => {
+      const next = { ...prev };
+      for (const id of trade.canGive) {
+        const qty = next[id] || 0;
+        if (qty >= 2) next[id] = qty - 1;
+      }
+      for (const id of trade.canGet) {
+        next[id] = (next[id] || 0) + 1;
+      }
+      return next;
+    });
+    setTrades(prev => prev.filter(t => t.id !== trade.id));
+  };
+
+  const rejectTrade = (tradeId) => {
     setTrades(prev => prev.filter(t => t.id !== tradeId));
   };
 
@@ -56,8 +71,8 @@ export default function App() {
   }
 
   if (view === 'trade') {
-    return <TradeMatchesScreen lang={lang} trades={trades} onRemoveTrade={removeTrade}
-      onNavigate={handleNavigate} />;
+    return <TradeMatchesScreen lang={lang} trades={trades} onAcceptTrade={acceptTrade}
+      onRejectTrade={rejectTrade} onNavigate={handleNavigate} />;
   }
 
   if (view === 'scan') {

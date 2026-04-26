@@ -60,7 +60,8 @@ const strings = {
     myTrades: 'Mis trueques',
     noTrades: 'Aún no tienes trueques. Escanea un QR para proponer uno.',
     tradeDate: 'Propuesto el',
-    deleteTrade: 'Eliminar',
+    deleteTrade: 'Rechazar',
+    acceptTrade: 'Aceptar trueque',
   },
   en: {
     greeting: 'Hey,',
@@ -123,7 +124,8 @@ const strings = {
     myTrades: 'My trades',
     noTrades: 'No trades yet. Scan a QR to propose one.',
     tradeDate: 'Proposed on',
-    deleteTrade: 'Delete',
+    deleteTrade: 'Reject',
+    acceptTrade: 'Accept trade',
   },
 };
 

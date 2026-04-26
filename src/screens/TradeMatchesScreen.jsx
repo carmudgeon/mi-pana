@@ -4,7 +4,7 @@ import DealSide from '../components/DealSide.jsx';
 import TabBar from '../components/TabBar.jsx';
 import { t } from '../i18n.js';
 
-function TradeCard({ trade, lang, onRemove }) {
+function TradeCard({ trade, lang, onAccept, onReject }) {
   const date = new Date(trade.createdAt);
   const dateStr = date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -44,19 +44,30 @@ function TradeCard({ trade, lang, onRemove }) {
         <DealSide direction="get" chips={trade.canGet.map(id => id.split('-'))} ariaLabel={t(lang, 'inLabel')} />
       </div>
 
-      <button onClick={() => onRemove(trade.id)} style={{
-        background: 'none', border: '1px solid var(--line)',
-        borderRadius: 'var(--r-button)', padding: '8px',
-        fontSize: 11, fontWeight: 700, color: 'var(--muted)',
-        cursor: 'pointer', fontFamily: 'var(--font-body)',
-      }}>
-        {t(lang, 'deleteTrade')}
-      </button>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button onClick={() => onAccept(trade)} style={{
+          flex: 1, padding: 10, borderRadius: 'var(--r-button)',
+          background: 'var(--c-green)', color: '#fff', border: 'none',
+          fontSize: 12, fontWeight: 800, cursor: 'pointer',
+          fontFamily: 'var(--font-body)',
+        }}>
+          {t(lang, 'acceptTrade')}
+        </button>
+        <button onClick={() => onReject(trade.id)} style={{
+          flex: 1, padding: 10, borderRadius: 'var(--r-button)',
+          background: '#fff', color: 'var(--muted)',
+          border: '1px solid var(--line)',
+          fontSize: 12, fontWeight: 700, cursor: 'pointer',
+          fontFamily: 'var(--font-body)',
+        }}>
+          {t(lang, 'deleteTrade')}
+        </button>
+      </div>
     </div>
   );
 }
 
-export default function TradeMatchesScreen({ lang, trades, onRemoveTrade, onNavigate }) {
+export default function TradeMatchesScreen({ lang, trades, onAcceptTrade, onRejectTrade, onNavigate }) {
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ padding: '8px 18px 12px' }}>
@@ -88,7 +99,8 @@ export default function TradeMatchesScreen({ lang, trades, onRemoveTrade, onNavi
           </div>
         ) : (
           trades.map(trade => (
-            <TradeCard key={trade.id} trade={trade} lang={lang} onRemove={onRemoveTrade} />
+            <TradeCard key={trade.id} trade={trade} lang={lang}
+              onAccept={onAcceptTrade} onReject={onRejectTrade} />
           ))
         )}
       </div>

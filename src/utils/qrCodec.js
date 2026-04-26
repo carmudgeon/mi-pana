@@ -29,6 +29,16 @@ function bitIndexToId(bitIdx) {
   return `${TEAMS[teamIdx].code}-${String(num).padStart(2, '0')}`;
 }
 
+function toBase64Url(b64) {
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromBase64Url(b64url) {
+  let b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4) b64 += '=';
+  return b64;
+}
+
 function bitsToBase64(bits) {
   const bytes = [];
   for (let i = 0; i < bits.length; i += 8) {
@@ -38,11 +48,16 @@ function bitsToBase64(bits) {
     }
     bytes.push(byte);
   }
-  return btoa(String.fromCharCode(...bytes));
+  return toBase64Url(btoa(String.fromCharCode(...bytes)));
 }
 
-function base64ToBits(b64, totalBits) {
-  const raw = atob(b64);
+function base64ToBits(b64url, totalBits) {
+  let raw;
+  try {
+    raw = atob(fromBase64Url(b64url));
+  } catch {
+    return new Array(totalBits).fill(false);
+  }
   const bits = new Array(totalBits).fill(false);
   for (let i = 0; i < raw.length; i++) {
     const byte = raw.charCodeAt(i);

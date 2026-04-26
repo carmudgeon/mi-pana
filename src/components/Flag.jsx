@@ -8,6 +8,7 @@ export default function Flag({ team, size = 38, radius = 10, fontSize = 11 }) {
       display: 'grid', placeItems: 'center',
       color: '#fff', fontWeight: 800, fontSize,
       fontFamily: 'var(--font-display)', letterSpacing: '0.02em',
+      textShadow: `1px 0 0 ${team.c1}, -1px 0 0 ${team.c1}, 0 1px 0 ${team.c1}, 0 -1px 0 ${team.c1}`,
       boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
     }}>
       {team.code}

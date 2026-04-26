@@ -89,6 +89,7 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
                     background: `linear-gradient(135deg, ${team.c1} 0 50%, ${team.c2} 50% 100%)`,
                     display: 'grid', placeItems: 'center',
                     fontSize: 7, fontWeight: 800, color: '#fff', fontFamily: 'var(--font-display)',
+                    textShadow: `1px 0 0 ${team.c1}, -1px 0 0 ${team.c1}, 0 1px 0 ${team.c1}, 0 -1px 0 ${team.c1}`,
                   }}>{team.code}</div>
                   <span style={{
                     fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 12,

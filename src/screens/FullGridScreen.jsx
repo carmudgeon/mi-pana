@@ -4,6 +4,14 @@ import FilterChip from '../components/FilterChip.jsx';
 import { TEAMS, getTeamAccent } from '../data.js';
 import { t } from '../i18n.js';
 
+function darkenHex(hex, amount = 0.55) {
+  const h = hex.replace('#', '');
+  const r = Math.round(parseInt(h.substring(0, 2), 16) * (1 - amount));
+  const g = Math.round(parseInt(h.substring(2, 4), 16) * (1 - amount));
+  const b = Math.round(parseInt(h.substring(4, 6), 16) * (1 - amount));
+  return `rgb(${r},${g},${b})`;
+}
+
 const STICKERS_PER_TEAM = 18;
 
 function buildAllStickers(collection) {
@@ -86,9 +94,10 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div style={{
                     width: 20, height: 20, borderRadius: 5,
-                    background: `linear-gradient(135deg, ${team.c1} 0 50%, ${team.c2} 50% 100%)`,
+                    background: team.c1,
                     display: 'grid', placeItems: 'center',
-                    fontSize: 7, fontWeight: 800, color: '#fff', fontFamily: 'var(--font-display)',
+                    fontSize: 7, fontWeight: 800, color: darkenHex(team.c1), fontFamily: 'var(--font-display)',
+                    textShadow: '0 0 1px rgba(255,255,255,0.4)',
                   }}>{team.code}</div>
                   <span style={{
                     fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 12,

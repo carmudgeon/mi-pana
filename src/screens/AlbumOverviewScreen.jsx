@@ -80,7 +80,14 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
         eyebrow={t(lang, 'albumEyebrow')} completedLabel={t(lang, 'completed')} />
 
       <div style={{ margin: '0 var(--screen-margin)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-        <QuickAction glyph="＋" label={t(lang, 'addAction')} color="var(--c-red)" />
+        <QuickAction glyph="✓✓" label={t(lang, 'addAction')} color="var(--c-red)" onClick={() => {
+          TEAMS.forEach(team => {
+            for (let i = 1; i <= 18; i++) {
+              const id = `${team.code}-${String(i).padStart(2, '0')}`;
+              if (!(collection[id] >= 1)) setSticker(id, 1);
+            }
+          });
+        }} />
         <QuickAction glyph="⇄" label={t(lang, 'tradeAction')} color="var(--c-blue)" onClick={() => onNavigate?.('trade')} />
         <QuickAction glyph="◐" label={t(lang, 'missingAction')} color="var(--c-green)" />
         <QuickAction glyph="⌘" label={t(lang, 'scanAction')} color="#0B0E13" onClick={() => onNavigate?.('scan')} />

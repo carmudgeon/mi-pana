@@ -7,17 +7,22 @@ import './ScanScreen.css';
 
 export default function ScanScreen({ collection, lang, onNavigate }) {
   const [activeTab, setActiveTab] = useState('generate');
+  const [tradeProposal, setTradeProposal] = useState(null);
+
+  const handleProposeTrade = (proposal) => {
+    setTradeProposal(proposal);
+    // TODO: connect to real trade flow / send to trade screen
+    alert(`Trueque propuesto: das ${proposal.canGive.length} cromos, recibes ${proposal.canGet.length} cromos`);
+  };
 
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {/* Header */}
       <div style={{ padding: '8px 18px 12px' }}>
         <b style={{ display: 'block', fontSize: 18, fontFamily: 'var(--font-display)' }}>
           {t(lang, 'scanTitle')}
         </b>
       </div>
 
-      {/* Tab toggle */}
       <div className="scan-tabs">
         <button
           className={`scan-tab ${activeTab === 'generate' ? 'on' : ''}`}
@@ -33,11 +38,10 @@ export default function ScanScreen({ collection, lang, onNavigate }) {
         </button>
       </div>
 
-      {/* Content */}
       <div style={{ flex: 1, paddingBottom: 16 }}>
         {activeTab === 'generate'
           ? <QrGenerator collection={collection} lang={lang} />
-          : <QrScanner collection={collection} lang={lang} />
+          : <QrScanner collection={collection} lang={lang} onProposeTrade={handleProposeTrade} />
         }
       </div>
 

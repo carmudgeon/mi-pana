@@ -3,6 +3,7 @@ import { TEAMS } from '../data.js';
 const PREFIX = 'MP26';
 const STICKERS_PER_TEAM = 18;
 const TOTAL_BITS = TEAMS.length * STICKERS_PER_TEAM; // 864
+const BYTES_PER_MAP = Math.ceil(TOTAL_BITS / 8); // 108
 
 function allStickerIds() {
   const ids = [];
@@ -39,7 +40,7 @@ function fromBase64Url(b64url) {
   return b64;
 }
 
-function bitsToBase64(bits) {
+function bitsToBytes(bits) {
   const bytes = [];
   for (let i = 0; i < bits.length; i += 8) {
     let byte = 0;
@@ -48,81 +49,120 @@ function bitsToBase64(bits) {
     }
     bytes.push(byte);
   }
-  return toBase64Url(btoa(String.fromCharCode(...bytes)));
+  return bytes;
 }
 
-function base64ToBits(b64url, totalBits) {
-  let raw;
-  try {
-    raw = atob(fromBase64Url(b64url));
-  } catch {
-    return new Array(totalBits).fill(false);
-  }
+function bytesToBits(bytes, totalBits) {
   const bits = new Array(totalBits).fill(false);
-  for (let i = 0; i < raw.length; i++) {
-    const byte = raw.charCodeAt(i);
+  for (let i = 0; i < bytes.length; i++) {
     for (let b = 0; b < 8; b++) {
       const idx = i * 8 + b;
       if (idx < totalBits) {
-        bits[idx] = !!(byte & (1 << (7 - b)));
+        bits[idx] = !!(bytes[i] & (1 << (7 - b)));
       }
     }
   }
   return bits;
 }
 
-export function encode(collection, mode) {
-  let ids;
-  if (mode === 'D') {
-    ids = Object.entries(collection)
-      .filter(([, qty]) => qty >= 2)
-      .map(([id]) => id);
-  } else {
-    ids = allStickerIds().filter(id => !(collection[id] >= 1));
-  }
-
-  if (ids.length === 0) return null;
-
+function bitsFromIds(ids) {
   const bits = new Array(TOTAL_BITS).fill(false);
   for (const id of ids) {
     const idx = idToBitIndex(id);
     if (idx >= 0) bits[idx] = true;
   }
-
-  return `${PREFIX}:${mode}:${bitsToBase64(bits)}`;
+  return bits;
 }
 
+function idsFromBits(bits) {
+  const ids = [];
+  for (let i = 0; i < TOTAL_BITS; i++) {
+    if (bits[i]) ids.push(bitIndexToId(i));
+  }
+  return ids;
+}
+
+/**
+ * Encode both duplicates and missing stickers into a single QR payload.
+ * Format: MP26:T:<base64url of 216 bytes>
+ *   First 108 bytes = duplicates bitmap
+ *   Next 108 bytes = missing/needs bitmap
+ */
+export function encode(collection) {
+  const dupIds = Object.entries(collection)
+    .filter(([, qty]) => qty >= 2)
+    .map(([id]) => id);
+
+  const needIds = allStickerIds().filter(id => !(collection[id] >= 1));
+
+  if (dupIds.length === 0 && needIds.length === 0) return null;
+
+  const dupBytes = bitsToBytes(bitsFromIds(dupIds));
+  const needBytes = bitsToBytes(bitsFromIds(needIds));
+
+  const allBytes = [...dupBytes, ...needBytes];
+  const b64 = toBase64Url(btoa(String.fromCharCode(...allBytes)));
+
+  return `${PREFIX}:T:${b64}`;
+}
+
+/**
+ * Decode a QR payload into duplicates and needs lists.
+ * Returns { duplicates: string[], needs: string[] }
+ */
 export function decode(payload) {
   if (!payload || !payload.startsWith(PREFIX + ':')) return null;
 
   const parts = payload.split(':');
   if (parts.length < 3) return null;
 
-  const mode = parts[1];
-  if (mode !== 'D' && mode !== 'N') return null;
+  const type = parts[1];
+  if (type !== 'T') return null;
 
   const data = parts.slice(2).join(':');
-  const stickers = [];
-
-  const bits = base64ToBits(data, TOTAL_BITS);
-  for (let i = 0; i < TOTAL_BITS; i++) {
-    if (bits[i]) stickers.push(bitIndexToId(i));
+  let raw;
+  try {
+    raw = atob(fromBase64Url(data));
+  } catch {
+    return null;
   }
 
-  if (stickers.length === 0) return null;
-  return { mode, stickers };
+  if (raw.length < BYTES_PER_MAP * 2) return null;
+
+  const dupByteArr = [];
+  const needByteArr = [];
+  for (let i = 0; i < BYTES_PER_MAP; i++) {
+    dupByteArr.push(raw.charCodeAt(i));
+    needByteArr.push(raw.charCodeAt(BYTES_PER_MAP + i));
+  }
+
+  const duplicates = idsFromBits(bytesToBits(dupByteArr, TOTAL_BITS));
+  const needs = idsFromBits(bytesToBits(needByteArr, TOTAL_BITS));
+
+  if (duplicates.length === 0 && needs.length === 0) return null;
+
+  return { duplicates, needs };
 }
 
-export function computeMatches(myCollection, theirStickers, theirMode) {
-  const matches = [];
-  for (const id of theirStickers) {
-    if (theirMode === 'D') {
-      if (!(myCollection[id] >= 1)) matches.push(id);
-    } else {
-      if ((myCollection[id] || 0) >= 2) matches.push(id);
-    }
+/**
+ * Given my collection and their decoded QR data, compute trade matches.
+ * Returns:
+ *   canGive: stickers I have as duplicates that they need
+ *   canGet: stickers they have as duplicates that I need
+ */
+export function computeMatches(myCollection, theirData) {
+  const canGive = [];
+  const canGet = [];
+
+  for (const id of theirData.needs) {
+    if ((myCollection[id] || 0) >= 2) canGive.push(id);
   }
-  return matches;
+
+  for (const id of theirData.duplicates) {
+    if (!(myCollection[id] >= 1)) canGet.push(id);
+  }
+
+  return { canGive, canGet };
 }
 
 export function countDuplicates(collection) {

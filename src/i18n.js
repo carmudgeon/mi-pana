@@ -54,6 +54,7 @@ const strings = {
     youCanGive: 'Puedes darle estos cromos',
     invalidQr: 'Código QR no válido',
     emptyList: 'No tienes cromos en esta categoría',
+    qrDescription: 'Este QR contiene tus repetidos y faltantes. Quien lo escanee verá las coincidencias para proponer un trueque.',
   },
   en: {
     greeting: 'Hey,',
@@ -110,6 +111,7 @@ const strings = {
     youCanGive: 'You can offer these stickers',
     invalidQr: 'Invalid QR code',
     emptyList: 'No stickers in this category',
+    qrDescription: 'This QR contains your duplicates and missing stickers. Anyone who scans it will see matches to propose a trade.',
   },
 };
 

@@ -4,14 +4,11 @@ import { encode, countDuplicates, countMissing } from '../utils/qrCodec.js';
 import { t } from '../i18n.js';
 
 export default function QrGenerator({ collection, lang }) {
-  const [mode, setMode] = useState('D');
   const [copied, setCopied] = useState(false);
 
-  const payload = encode(collection, mode);
-  const count = mode === 'D' ? countDuplicates(collection) : countMissing(collection);
-  const summary = mode === 'D'
-    ? t(lang, 'duplicateCount', count)
-    : t(lang, 'missingCount', count);
+  const payload = encode(collection);
+  const dups = countDuplicates(collection);
+  const missing = countMissing(collection);
 
   const handleCopy = () => {
     if (!payload) return;
@@ -23,32 +20,39 @@ export default function QrGenerator({ collection, lang }) {
 
   return (
     <div style={{ padding: '0 var(--screen-margin)' }}>
-      {/* Mode toggle */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 14 }}>
-        {[['D', t(lang, 'modeDuplicates')], ['N', t(lang, 'modeNeeds')]].map(([m, label]) => (
-          <button key={m} onClick={() => { setMode(m); setCopied(false); }} style={{
-            flex: 1, padding: '8px 12px', borderRadius: 'var(--r-pill)',
-            background: mode === m ? 'var(--ink)' : '#fff',
-            color: mode === m ? '#fff' : 'var(--ink)',
-            border: `1px solid ${mode === m ? 'var(--ink)' : 'var(--line)'}`,
-            fontSize: 12, fontWeight: 700, cursor: 'pointer',
-            fontFamily: 'var(--font-body)',
-          }}>
-            {label}
-          </button>
-        ))}
-      </div>
-
       {/* Summary */}
       <div style={{
-        textAlign: 'center', fontSize: 13, color: 'var(--muted)',
-        fontFamily: 'var(--font-mono)', marginBottom: 16,
+        display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'center',
       }}>
-        {summary}
+        <div style={{
+          padding: '6px 12px', borderRadius: 'var(--r-pill)',
+          background: 'rgba(13,16,36,0.05)',
+          fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
+          color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--c-magenta)' }} />
+          {t(lang, 'duplicateCount', dups)}
+        </div>
+        <div style={{
+          padding: '6px 12px', borderRadius: 'var(--r-pill)',
+          background: 'rgba(13,16,36,0.05)',
+          fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
+          color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 6,
+        }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--c-orange)' }} />
+          {t(lang, 'missingCount', missing)}
+        </div>
       </div>
 
       {payload ? (
         <>
+          <div style={{
+            textAlign: 'center', fontSize: 11, color: 'var(--muted)',
+            marginBottom: 12, lineHeight: 1.4,
+          }}>
+            {t(lang, 'qrDescription')}
+          </div>
+
           {/* QR Card */}
           <div style={{
             background: '#fff', borderRadius: 'var(--r-card)',
@@ -72,7 +76,7 @@ export default function QrGenerator({ collection, lang }) {
             </div>
           </div>
           <button onClick={handleCopy} style={{
-            width: '100%', padding: '10px', borderRadius: 'var(--r-button)',
+            width: '100%', padding: 10, borderRadius: 'var(--r-button)',
             background: copied ? 'var(--c-green)' : 'var(--ink)',
             color: '#fff', border: 'none', fontSize: 12, fontWeight: 800,
             cursor: 'pointer', fontFamily: 'var(--font-body)',

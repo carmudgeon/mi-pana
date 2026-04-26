@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TradeHero from '../components/TradeHero.jsx';
 import DealSide from '../components/DealSide.jsx';
+import QrGenerator from '../components/QrGenerator.jsx';
+import QrScanner from '../components/QrScanner.jsx';
 import TabBar from '../components/TabBar.jsx';
 import { t } from '../i18n.js';
+import '../screens/ScanScreen.css';
 
 function TradeCard({ trade, lang, onAccept, onReject }) {
   const date = new Date(trade.createdAt);
@@ -67,7 +70,20 @@ function TradeCard({ trade, lang, onAccept, onReject }) {
   );
 }
 
-export default function TradeMatchesScreen({ lang, trades, onAcceptTrade, onRejectTrade, onNavigate }) {
+const TABS = [
+  { key: 'trades', labelKey: 'myTrades' },
+  { key: 'generate', labelKey: 'generateTab' },
+  { key: 'scan', labelKey: 'scanTab' },
+];
+
+export default function TradeMatchesScreen({ lang, collection, trades, onAcceptTrade, onRejectTrade, onProposeTrade, onNavigate }) {
+  const [activeTab, setActiveTab] = useState('trades');
+
+  const handlePropose = (proposal) => {
+    onProposeTrade?.(proposal);
+    setActiveTab('trades');
+  };
+
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ padding: '8px 18px 12px' }}>
@@ -77,31 +93,56 @@ export default function TradeMatchesScreen({ lang, trades, onAcceptTrade, onReje
         </span>
       </div>
 
-      <TradeHero title={t(lang, 'tradeHeroTitle')} body={t(lang, 'tradeHeroBody', 47, 23)}
-        ctaLabel={t(lang, 'findMatch')} onCtaClick={() => onNavigate?.('scan')} />
-
-      <div style={{ margin: '6px 18px 12px' }}>
-        <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, letterSpacing: '-0.005em' }}>
-          {t(lang, 'myTrades')}
-        </h3>
+      {/* Sub-tabs */}
+      <div className="scan-tabs">
+        {TABS.map(tab => (
+          <button
+            key={tab.key}
+            className={`scan-tab ${activeTab === tab.key ? 'on' : ''}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {t(lang, tab.labelKey)}
+          </button>
+        ))}
       </div>
 
-      <div style={{ flex: 1 }}>
-        {trades.length === 0 ? (
-          <div style={{
-            margin: '0 var(--screen-margin)',
-            textAlign: 'center', padding: 40, color: 'var(--muted)',
-            fontSize: 13, background: 'rgba(13,16,36,0.03)',
-            borderRadius: 'var(--r-card)', border: '1px dashed var(--line-strong)',
-            lineHeight: 1.5,
-          }}>
-            {t(lang, 'noTrades')}
-          </div>
-        ) : (
-          trades.map(trade => (
-            <TradeCard key={trade.id} trade={trade} lang={lang}
-              onAccept={onAcceptTrade} onReject={onRejectTrade} />
-          ))
+      <div style={{ flex: 1, paddingBottom: 16 }}>
+        {activeTab === 'trades' && (
+          <>
+            <TradeHero title={t(lang, 'tradeHeroTitle')} body={t(lang, 'tradeHeroBody', 47, 23)}
+              ctaLabel={t(lang, 'scanTab')} onCtaClick={() => setActiveTab('scan')} />
+
+            <div style={{ margin: '6px 18px 12px' }}>
+              <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, letterSpacing: '-0.005em' }}>
+                {t(lang, 'myTrades')}
+              </h3>
+            </div>
+
+            {trades.length === 0 ? (
+              <div style={{
+                margin: '0 var(--screen-margin)',
+                textAlign: 'center', padding: 40, color: 'var(--muted)',
+                fontSize: 13, background: 'rgba(13,16,36,0.03)',
+                borderRadius: 'var(--r-card)', border: '1px dashed var(--line-strong)',
+                lineHeight: 1.5,
+              }}>
+                {t(lang, 'noTrades')}
+              </div>
+            ) : (
+              trades.map(trade => (
+                <TradeCard key={trade.id} trade={trade} lang={lang}
+                  onAccept={onAcceptTrade} onReject={onRejectTrade} />
+              ))
+            )}
+          </>
+        )}
+
+        {activeTab === 'generate' && (
+          <QrGenerator collection={collection} lang={lang} />
+        )}
+
+        {activeTab === 'scan' && (
+          <QrScanner collection={collection} lang={lang} onProposeTrade={handlePropose} />
         )}
       </div>
 

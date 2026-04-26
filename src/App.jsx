@@ -3,7 +3,6 @@ import usePersistentState from './hooks/usePersistentState.js';
 import AlbumOverviewScreen from './screens/AlbumOverviewScreen.jsx';
 import TeamDetailScreen from './screens/TeamDetailScreen.jsx';
 import TradeMatchesScreen from './screens/TradeMatchesScreen.jsx';
-import ScanScreen from './screens/ScanScreen.jsx';
 
 export default function App() {
   const [collection, setCollection] = usePersistentState('panini2026-collection', {});
@@ -30,7 +29,6 @@ export default function App() {
       canGet: proposal.canGet,
     };
     setTrades(prev => [trade, ...prev]);
-    setView('trade');
   };
 
   const acceptTrade = (trade) => {
@@ -55,7 +53,6 @@ export default function App() {
   const handleNavigate = (tab) => {
     if (tab === 'home' || tab === 'teams') { setView('home'); setSelectedTeam(null); }
     else if (tab === 'trade') setView('trade');
-    else if (tab === 'scan') setView('scan');
   };
 
   const handleSelectTeam = (team) => {
@@ -71,13 +68,9 @@ export default function App() {
   }
 
   if (view === 'trade') {
-    return <TradeMatchesScreen lang={lang} trades={trades} onAcceptTrade={acceptTrade}
-      onRejectTrade={rejectTrade} onNavigate={handleNavigate} />;
-  }
-
-  if (view === 'scan') {
-    return <ScanScreen collection={collection} lang={lang} onNavigate={handleNavigate}
-      onProposeTrade={addTrade} />;
+    return <TradeMatchesScreen lang={lang} collection={collection} trades={trades}
+      onAcceptTrade={acceptTrade} onRejectTrade={rejectTrade} onProposeTrade={addTrade}
+      onNavigate={handleNavigate} />;
   }
 
   return (

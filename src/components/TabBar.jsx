@@ -5,7 +5,6 @@ const TABS = [
   ['home', 'Álbum', '▦'],
   ['teams', 'Equipos', '◉'],
   ['trade', 'Trueque', '⇄'],
-  ['scan', 'Escanear', '⊕'],
   ['me', 'Yo', '◍'],
 ];
 

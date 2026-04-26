@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import jsQR from 'jsqr';
 import { decode, computeMatches } from '../utils/qrCodec.js';
 import { getTeamAccent } from '../data.js';
@@ -35,14 +35,117 @@ function StickerChips({ ids }) {
   ));
 }
 
+function CameraScanner({ onDetected, lang }) {
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+  const rafRef = useRef(null);
+  const [cameraError, setCameraError] = useState(null);
+
+  const stopCamera = useCallback(() => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } },
+        });
+        if (!mounted) { stream.getTracks().forEach(t => t.stop()); return; }
+
+        streamRef.current = stream;
+        const video = videoRef.current;
+        video.srcObject = stream;
+        await video.play();
+
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        function scan() {
+          if (!mounted || video.readyState !== video.HAVE_ENOUGH_DATA) {
+            rafRef.current = requestAnimationFrame(scan);
+            return;
+          }
+
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+          if (code?.data) {
+            onDetected(code.data);
+            return;
+          }
+
+          rafRef.current = requestAnimationFrame(scan);
+        }
+
+        rafRef.current = requestAnimationFrame(scan);
+      } catch (err) {
+        if (mounted) setCameraError(err.message || 'Camera not available');
+      }
+    }
+
+    startCamera();
+
+    return () => {
+      mounted = false;
+      stopCamera();
+    };
+  }, [onDetected, stopCamera]);
+
+  if (cameraError) {
+    return (
+      <div style={{
+        padding: 20, textAlign: 'center', color: 'var(--muted)', fontSize: 12,
+        background: 'rgba(13,16,36,0.04)', borderRadius: 'var(--r-card)',
+      }}>
+        {cameraError}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ position: 'relative', borderRadius: 'var(--r-card)', overflow: 'hidden' }}>
+      <video
+        ref={videoRef}
+        playsInline
+        muted
+        style={{ width: '100%', display: 'block', borderRadius: 'var(--r-card)' }}
+      />
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+      {/* Scan overlay */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        pointerEvents: 'none',
+      }}>
+        <div style={{
+          width: 180, height: 180,
+          border: '3px solid var(--c-yellow)',
+          borderRadius: 16,
+          boxShadow: '0 0 0 9999px rgba(0,0,0,0.3)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
 export default function QrScanner({ collection, lang, onProposeTrade }) {
   const [inputText, setInputText] = useState('');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [scanning, setScanning] = useState(false);
-  const fileRef = useRef(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
 
-  const runAnalysis = (text) => {
+  const runAnalysis = useCallback((text) => {
     const payload = text.trim();
     setError(null);
     setResult(null);
@@ -54,94 +157,91 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
     }
 
     const { canGive, canGet } = computeMatches(collection, decoded);
-    setResult({ canGive, canGet, theirDups: decoded.duplicates.length, theirNeeds: decoded.needs.length });
-  };
+    setResult({ canGive, canGet });
+  }, [collection, lang]);
 
   const handleAnalyze = () => runAnalysis(inputText);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setScanning(true);
-    setError(null);
-    setResult(null);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const maxDim = 1024;
-        let w = img.width, h = img.height;
-        if (w > maxDim || h > maxDim) {
-          const scale = maxDim / Math.max(w, h);
-          w = Math.round(w * scale);
-          h = Math.round(h * scale);
-        }
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        try {
-          const imageData = ctx.getImageData(0, 0, w, h);
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
-          if (code?.data) {
-            setInputText(code.data);
-            runAnalysis(code.data);
-          } else {
-            setError(t(lang, 'invalidQr'));
-          }
-        } catch {
-          setError(t(lang, 'invalidQr'));
-        }
-        setScanning(false);
-      };
-      img.onerror = () => { setError(t(lang, 'invalidQr')); setScanning(false); };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
-  };
+  const handleCameraDetected = useCallback((data) => {
+    setCameraOpen(false);
+    setInputText(data);
+    runAnalysis(data);
+  }, [runAnalysis]);
 
   const totalMatches = result ? result.canGive.length + result.canGet.length : 0;
 
   return (
     <div style={{ padding: '0 var(--screen-margin)' }}>
-      <textarea
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-        placeholder={t(lang, 'pastePrompt')}
-        rows={3}
-        style={{
-          width: '100%', padding: 12, borderRadius: 'var(--r-sticker)',
-          border: '1px solid var(--line)', background: '#fff',
-          fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ink)',
-          resize: 'vertical', outline: 'none',
-        }}
-      />
+      {/* Camera */}
+      {cameraOpen ? (
+        <div style={{ marginBottom: 12 }}>
+          <CameraScanner onDetected={handleCameraDetected} lang={lang} />
+          <button onClick={() => setCameraOpen(false)} style={{
+            width: '100%', marginTop: 8, padding: 10, borderRadius: 'var(--r-button)',
+            background: '#fff', color: 'var(--ink)',
+            border: '1px solid var(--line-strong)',
+            fontSize: 11, fontWeight: 700, cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+          }}>
+            {t(lang, 'closeCamera')}
+          </button>
+        </div>
+      ) : (
+        <>
+          {/* Open camera button */}
+          <button onClick={() => { setCameraOpen(true); setError(null); setResult(null); }} style={{
+            width: '100%', padding: 12, borderRadius: 'var(--r-button)',
+            background: 'var(--ink)', color: '#fff', border: 'none',
+            fontSize: 13, fontWeight: 800, cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            marginBottom: 12,
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            {t(lang, 'openCamera')}
+          </button>
 
-      <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-        <button onClick={handleAnalyze} disabled={!inputText.trim()} style={{
-          flex: 1, padding: 10, borderRadius: 'var(--r-button)',
-          background: inputText.trim() ? 'var(--c-blue)' : 'rgba(13,16,36,0.08)',
-          color: inputText.trim() ? '#fff' : 'var(--muted)', border: 'none',
-          fontSize: 12, fontWeight: 800, cursor: inputText.trim() ? 'pointer' : 'not-allowed',
-          fontFamily: 'var(--font-body)',
-        }}>
-          {t(lang, 'analyze')}
-        </button>
-        <button onClick={() => fileRef.current?.click()} disabled={scanning} style={{
-          flex: 1, padding: 10, borderRadius: 'var(--r-button)',
-          background: '#fff', color: 'var(--ink)',
-          border: '1px solid var(--line-strong)',
-          fontSize: 11, fontWeight: 700, cursor: 'pointer',
-          fontFamily: 'var(--font-body)',
-        }}>
-          {scanning ? '...' : t(lang, 'uploadQr')}
-        </button>
-        <input ref={fileRef} type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
-      </div>
+          {/* Divider */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12,
+            color: 'var(--muted)', fontSize: 10, fontFamily: 'var(--font-mono)',
+            letterSpacing: '0.1em',
+          }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+            O
+            <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+          </div>
 
+          {/* Text input */}
+          <textarea
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder={t(lang, 'pastePrompt')}
+            rows={3}
+            style={{
+              width: '100%', padding: 12, borderRadius: 'var(--r-sticker)',
+              border: '1px solid var(--line)', background: '#fff',
+              fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--ink)',
+              resize: 'vertical', outline: 'none',
+            }}
+          />
+
+          <button onClick={handleAnalyze} disabled={!inputText.trim()} style={{
+            width: '100%', marginTop: 8, padding: 10, borderRadius: 'var(--r-button)',
+            background: inputText.trim() ? 'var(--c-blue)' : 'rgba(13,16,36,0.08)',
+            color: inputText.trim() ? '#fff' : 'var(--muted)', border: 'none',
+            fontSize: 12, fontWeight: 800, cursor: inputText.trim() ? 'pointer' : 'not-allowed',
+            fontFamily: 'var(--font-body)',
+          }}>
+            {t(lang, 'analyze')}
+          </button>
+        </>
+      )}
+
+      {/* Error */}
       {error && (
         <div style={{
           marginTop: 12, padding: 10, borderRadius: 'var(--r-sticker)',
@@ -150,9 +250,9 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
         }}>{error}</div>
       )}
 
+      {/* Results */}
       {result && (
         <div style={{ marginTop: 16 }}>
-          {/* Match summary */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             marginBottom: 14,
@@ -173,7 +273,6 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
               background: '#0E1426', borderRadius: 'var(--r-panel)',
               overflow: 'hidden', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.05)',
             }}>
-              {/* Can give (red ↓) */}
               {result.canGive.length > 0 && (
                 <div style={{ padding: 14 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -200,7 +299,6 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
                 }} />
               )}
 
-              {/* Can get (green ↑) */}
               {result.canGet.length > 0 && (
                 <div style={{ padding: 14 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
@@ -222,7 +320,6 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
             </div>
           )}
 
-          {/* Propose trade CTA */}
           {totalMatches > 0 && (
             <button
               onClick={() => onProposeTrade?.({ canGive: result.canGive, canGet: result.canGet })}

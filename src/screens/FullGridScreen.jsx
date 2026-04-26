@@ -94,10 +94,10 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <div style={{
                     width: 20, height: 20, borderRadius: 5,
-                    background: team.c1,
+                    background: `linear-gradient(135deg, ${team.c1} 0 50%, ${team.c2} 50% 100%)`,
                     display: 'grid', placeItems: 'center',
                     fontSize: 7, fontWeight: 800, color: darkenHex(team.c1), fontFamily: 'var(--font-display)',
-                    textShadow: '0 0 1px rgba(255,255,255,0.4)',
+                    textShadow: '0 0 2px rgba(255,255,255,0.6)',
                   }}>{team.code}</div>
                   <span style={{
                     fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 12,

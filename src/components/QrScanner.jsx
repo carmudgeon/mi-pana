@@ -320,7 +320,13 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
             </div>
           )}
 
-          {totalMatches > 0 && (
+          {totalMatches > 0 && (() => {
+            const hasGive = result.canGive.length > 0;
+            const hasGet = result.canGet.length > 0;
+            const label = hasGive && hasGet
+              ? t(lang, 'proposeTrade')
+              : hasGive ? t(lang, 'proposeGiveOnly') : t(lang, 'proposeGetOnly');
+            return (
             <button
               onClick={() => onProposeTrade?.({ canGive: result.canGive, canGet: result.canGet })}
               style={{
@@ -332,9 +338,10 @@ export default function QrScanner({ collection, lang, onProposeTrade }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
-              ⇄ {t(lang, 'proposeTrade')}
+              ⇄ {label}
             </button>
-          )}
+            );
+          })()}
         </div>
       )}
     </div>

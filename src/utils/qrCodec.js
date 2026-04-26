@@ -166,6 +166,10 @@ export function computeMatches(myCollection, theirData) {
 }
 
 export function countDuplicates(collection) {
+  return Object.values(collection).reduce((sum, qty) => sum + Math.max(0, qty - 1), 0);
+}
+
+export function countDuplicateStickers(collection) {
   return Object.values(collection).filter(qty => qty >= 2).length;
 }
 

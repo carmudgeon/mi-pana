@@ -10,6 +10,10 @@ export default function QrGenerator({ collection, lang }) {
   const dups = countDuplicates(collection);
   const missing = countMissing(collection);
 
+  const descriptionKey = dups > 0 && missing > 0
+    ? 'qrBoth'
+    : dups > 0 ? 'qrOnlyDups' : 'qrOnlyMissing';
+
   const handleCopy = () => {
     if (!payload) return;
     navigator.clipboard.writeText(payload).then(() => {
@@ -20,24 +24,26 @@ export default function QrGenerator({ collection, lang }) {
 
   return (
     <div style={{ padding: '0 var(--screen-margin)' }}>
-      {/* Summary */}
+      {/* Summary pills */}
       <div style={{
-        display: 'flex', gap: 8, marginBottom: 16, justifyContent: 'center',
+        display: 'flex', gap: 8, marginBottom: 12, justifyContent: 'center',
       }}>
         <div style={{
           padding: '6px 12px', borderRadius: 'var(--r-pill)',
-          background: 'rgba(13,16,36,0.05)',
+          background: dups > 0 ? 'rgba(216,30,120,0.1)' : 'rgba(13,16,36,0.05)',
           fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
-          color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 6,
+          color: dups > 0 ? 'var(--c-magenta)' : 'var(--muted)',
+          display: 'flex', alignItems: 'center', gap: 6,
         }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--c-magenta)' }} />
           {t(lang, 'duplicateCount', dups)}
         </div>
         <div style={{
           padding: '6px 12px', borderRadius: 'var(--r-pill)',
-          background: 'rgba(13,16,36,0.05)',
+          background: missing > 0 ? 'rgba(255,106,26,0.1)' : 'rgba(13,16,36,0.05)',
           fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 700,
-          color: 'var(--ink)', display: 'flex', alignItems: 'center', gap: 6,
+          color: missing > 0 ? 'var(--c-orange)' : 'var(--muted)',
+          display: 'flex', alignItems: 'center', gap: 6,
         }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--c-orange)' }} />
           {t(lang, 'missingCount', missing)}
@@ -46,14 +52,14 @@ export default function QrGenerator({ collection, lang }) {
 
       {payload ? (
         <>
+          {/* Context-aware description */}
           <div style={{
             textAlign: 'center', fontSize: 11, color: 'var(--muted)',
             marginBottom: 12, lineHeight: 1.4,
           }}>
-            {t(lang, 'qrDescription')}
+            {t(lang, descriptionKey)}
           </div>
 
-          {/* QR Card */}
           <div style={{
             background: '#fff', borderRadius: 'var(--r-card)',
             border: '1px solid var(--line)', padding: 24,
@@ -63,7 +69,6 @@ export default function QrGenerator({ collection, lang }) {
             <QRCodeSVG value={payload} size={220} level="L" />
           </div>
 
-          {/* Payload text + copy */}
           <div style={{
             background: 'rgba(13,16,36,0.04)', borderRadius: 'var(--r-sticker)',
             padding: 12, marginBottom: 12,

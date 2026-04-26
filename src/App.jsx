@@ -9,6 +9,7 @@ export default function App() {
   const [collection, setCollection] = usePersistentState('panini2026-collection', {});
   const [view, setView] = useState('home');
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [pendingTrade, setPendingTrade] = useState(null);
   const lang = 'es';
   const userName = 'Diego';
 
@@ -40,11 +41,13 @@ export default function App() {
   }
 
   if (view === 'trade') {
-    return <TradeMatchesScreen lang={lang} onNavigate={handleNavigate} />;
+    return <TradeMatchesScreen lang={lang} pendingTrade={pendingTrade}
+      onClearTrade={() => setPendingTrade(null)} onNavigate={handleNavigate} />;
   }
 
   if (view === 'scan') {
-    return <ScanScreen collection={collection} lang={lang} onNavigate={handleNavigate} />;
+    return <ScanScreen collection={collection} lang={lang} onNavigate={handleNavigate}
+      onProposeTrade={(proposal) => { setPendingTrade(proposal); setView('trade'); }} />;
   }
 
   return (

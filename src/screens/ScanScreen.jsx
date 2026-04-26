@@ -5,15 +5,8 @@ import TabBar from '../components/TabBar.jsx';
 import { t } from '../i18n.js';
 import './ScanScreen.css';
 
-export default function ScanScreen({ collection, lang, onNavigate }) {
+export default function ScanScreen({ collection, lang, onNavigate, onProposeTrade }) {
   const [activeTab, setActiveTab] = useState('generate');
-  const [tradeProposal, setTradeProposal] = useState(null);
-
-  const handleProposeTrade = (proposal) => {
-    setTradeProposal(proposal);
-    // TODO: connect to real trade flow / send to trade screen
-    alert(`Trueque propuesto: das ${proposal.canGive.length} cromos, recibes ${proposal.canGet.length} cromos`);
-  };
 
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -41,7 +34,7 @@ export default function ScanScreen({ collection, lang, onNavigate }) {
       <div style={{ flex: 1, paddingBottom: 16 }}>
         {activeTab === 'generate'
           ? <QrGenerator collection={collection} lang={lang} />
-          : <QrScanner collection={collection} lang={lang} onProposeTrade={handleProposeTrade} />
+          : <QrScanner collection={collection} lang={lang} onProposeTrade={onProposeTrade} />
         }
       </div>
 

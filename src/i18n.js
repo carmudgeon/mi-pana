@@ -1,7 +1,7 @@
 const strings = {
   es: {
     greeting: 'Hola,',
-    subtitle: 'mundial 2026 · día 142',
+    subtitle: 'mundial 2026',
     albumEyebrow: 'TU ÁLBUM · MI PANA 26',
     heroTitle: (name) => `Vas bien encaminado, ${name}.`,
     heroTitleEm: 'bien encaminado',

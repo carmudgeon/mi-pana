@@ -19,7 +19,7 @@ export default function Sticker({ sticker, state, dupCount, index, qty = 0, addL
   return (
     <div className={`sticker ${state}${dupCount ? ' dup' : ''}`}>
       <div className="sticker-num">{sticker.number}</div>
-      <div className="sticker-top" style={{ background: isOwned ? accent : undefined }}>
+      <div className="sticker-top" onClick={() => onIncrement?.()} style={{ background: isOwned ? accent : undefined, cursor: 'pointer' }}>
         <div className="sticker-silhouette" />
       </div>
       {isOwned && <div className="sticker-owned-dot" />}

@@ -13,9 +13,9 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
 
   const stickerStates = stickers.map(s => {
     const qty = collection[s.id] || 0;
-    if (qty === 0) return { ...s, state: 'miss', dupCount: 0 };
-    if (qty >= 2) return { ...s, state: 'dup', dupCount: qty };
-    return { ...s, state: 'owned', dupCount: 0 };
+    if (qty === 0) return { ...s, state: 'miss', qty };
+    if (qty >= 2) return { ...s, state: 'dup', qty };
+    return { ...s, state: 'owned', qty };
   });
 
   const counts = {
@@ -25,6 +25,7 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
     dup: stickerStates.filter(s => s.state === 'dup').length,
   };
   const pct = counts.all > 0 ? Math.round((counts.owned / counts.all) * 100) : 0;
+  const allOwned = counts.owned === counts.all;
 
   const filtered = stickerStates.filter(s => {
     if (filter === 'owned') return s.state === 'owned' || s.state === 'dup';
@@ -33,9 +34,14 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
     return true;
   });
 
-  const handleStickerClick = (sticker) => {
-    const qty = collection[sticker.id] || 0;
-    setSticker(sticker.id, qty + 1);
+  const handleMarkAll = () => {
+    stickers.forEach(s => {
+      if ((collection[s.id] || 0) < 1) setSticker(s.id, 1);
+    });
+  };
+
+  const handleUnmarkAll = () => {
+    stickers.forEach(s => setSticker(s.id, 0));
   };
 
   return (
@@ -55,6 +61,24 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
 
       <TeamHero team={team} pct={pct} groupLabel={t(lang, 'group')} cardsLabel={t(lang, 'cards')} />
 
+      {/* Mark all / Unmark all */}
+      <div style={{ margin: '0 var(--screen-margin) 8px' }}>
+        <button
+          onClick={allOwned ? handleUnmarkAll : handleMarkAll}
+          style={{
+            padding: '8px 14px', borderRadius: 'var(--r-button)',
+            background: allOwned ? '#fff' : 'var(--c-green)',
+            color: allOwned ? 'var(--muted)' : '#fff',
+            border: allOwned ? '1px solid var(--line)' : 'none',
+            fontSize: 11, fontWeight: 800, cursor: 'pointer',
+            fontFamily: 'var(--font-body)',
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+          }}
+        >
+          {allOwned ? '↩ ' + t(lang, 'unmarkAll') : '✓✓ ' + t(lang, 'markAll')}
+        </button>
+      </div>
+
       <div style={{ margin: '0 var(--screen-margin) 12px', display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
         <FilterChip label={t(lang, 'filterAll')} count={counts.all} active={filter === 'all'} onClick={() => setFilter('all')} />
         <FilterChip label={t(lang, 'filterOwned')} count={counts.owned} active={filter === 'owned'} onClick={() => setFilter('owned')} />
@@ -68,8 +92,12 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
       }}>
         {filtered.map((s, i) => (
           <Sticker key={s.id} sticker={s} state={s.state}
-            dupCount={s.dupCount > 1 ? s.dupCount : undefined}
-            index={i} addLabel={t(lang, 'add')} onClick={() => handleStickerClick(s)} />
+            dupCount={s.qty >= 2 ? s.qty : undefined}
+            qty={s.qty}
+            index={i} addLabel={t(lang, 'add')}
+            onIncrement={() => setSticker(s.id, s.qty + 1)}
+            onDecrement={() => setSticker(s.id, Math.max(0, s.qty - 1))}
+          />
         ))}
         <Sticker state="add" index={filtered.length} addLabel={t(lang, 'add')} sticker={{}} />
       </div>

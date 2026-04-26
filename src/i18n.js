@@ -31,6 +31,11 @@ const strings = {
     outLabel: 'Sale',
     inLabel: 'Entra',
     add: 'Agregar',
+    markAll: 'Marcar todas',
+    unmarkAll: 'Desmarcar todas',
+    searchTeam: 'Buscar equipo...',
+    allConfeds: 'Todas',
+    noTeamsFound: 'No se encontraron equipos con ese filtro.',
   },
   en: {
     greeting: 'Hey,',
@@ -64,6 +69,11 @@ const strings = {
     outLabel: 'Out',
     inLabel: 'In',
     add: 'Add',
+    markAll: 'Mark all',
+    unmarkAll: 'Unmark all',
+    searchTeam: 'Search team...',
+    allConfeds: 'All',
+    noTeamsFound: 'No teams found with that filter.',
   },
 };
 

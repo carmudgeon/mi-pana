@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mi Pana 26 · Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Archivo+Narrow:wght@600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    /* World Cup 2026 mosaic palette — saturated, no pastels */
+    --bg: #0B1020;
+    --panel: #141A2E;
+    --ink: #0D1024;
+    --paper: #FFFFFF;
+    --paper-2:#F2F1ED;
+    --line: rgba(13,16,36,0.10);
+    --line-strong: rgba(13,16,36,0.22);
+    --muted: #6B6E80;
+
+    --c-yellow:  #FFC60B;
+    --c-orange:  #FF6A1A;
+    --c-red:     #E61E3C;
+    --c-magenta: #D81E78;
+    --c-violet:  #6E33CC;
+    --c-blue:    #1F4FE0;
+    --c-teal:    #00B3A4;
+    --c-green:   #14A85E;
+
+    --vino: var(--c-red);
+    --oro:  var(--c-yellow);
+    --azul: var(--c-blue);
+    --verde:var(--c-green);
+  }
+  html,body{margin:0;padding:0;background:var(--bg);font-family:'Archivo',system-ui,sans-serif;color:#fff;}
+  *{box-sizing:border-box;}
+  .stage{
+    min-height:100vh;
+    padding:48px 32px 80px;
+    display:flex;flex-direction:column;align-items:center;gap:32px;
+  }
+  .header{
+    width:100%;max-width:1480px;
+    display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
+    border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:20px;
+  }
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand-mark{
+    width:46px;height:46px;border-radius:14px;
+    background:
+      conic-gradient(from 210deg,
+        var(--c-yellow) 0 12.5%, var(--c-orange) 0 25%,
+        var(--c-red) 0 37.5%, var(--c-magenta) 0 50%,
+        var(--c-violet) 0 62.5%, var(--c-blue) 0 75%,
+        var(--c-teal) 0 87.5%, var(--c-green) 0 100%);
+    display:grid;place-items:center;color:#fff;font-weight:900;font-family:'Archivo Narrow';
+    letter-spacing:-0.02em;font-size:20px;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,0.85), inset 0 0 0 3px rgba(17,20,42,0.15);
+    text-shadow:0 1px 2px rgba(0,0,0,0.35);
+  }
+  .brand-name{font-family:'Archivo Narrow';font-weight:800;font-size:28px;letter-spacing:-0.01em;}
+  .brand-sub{color:rgba(255,255,255,0.5);font-size:13px;margin-top:2px;font-family:'JetBrains Mono';letter-spacing:0.04em;}
+  .header-meta{
+    text-align:right;color:rgba(255,255,255,0.55);
+    font-family:'JetBrains Mono';font-size:12px;line-height:1.6;letter-spacing:0.04em;
+  }
+  .header-meta b{color:#fff;font-weight:700;}
+
+  .row{
+    display:flex;gap:36px;align-items:flex-start;justify-content:center;flex-wrap:wrap;
+    width:100%;max-width:1480px;
+  }
+  .phone-card{display:flex;flex-direction:column;gap:14px;align-items:center;}
+  .phone-label{
+    font-family:'JetBrains Mono';font-size:11px;letter-spacing:0.18em;text-transform:uppercase;
+    color:rgba(255,255,255,0.55);
+    display:flex;align-items:center;gap:10px;
+  }
+  .phone-label .num{
+    display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;
+    background:var(--oro);color:#0B0E13;font-weight:800;font-family:'Archivo';font-size:12px;letter-spacing:0;
+  }
+  .phone-caption{
+    max-width:380px;text-align:center;color:rgba(255,255,255,0.6);font-size:13px;line-height:1.5;
+  }
+
+  /* —— Inside-screen styles —— */
+  .scr{
+    min-height:100%;color:var(--ink);
+    font-family:'Archivo',system-ui,sans-serif;
+    display:flex;flex-direction:column;
+    padding-top:52px;
+    background:#FFFFFF;
+    position:relative;
+  }
+  /* Mosaic background: bold geometric arcs/circles like the album cover */
+  .scr::before{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+    background:
+      radial-gradient(circle at 0% 14%,   var(--c-yellow)  0 70px, transparent 70px),
+      radial-gradient(circle at 100% 14%, var(--c-magenta) 0 90px, transparent 90px),
+      radial-gradient(circle at 0% 100%,  var(--c-blue)    0 120px, transparent 120px),
+      radial-gradient(circle at 100% 100%,var(--c-green)   0 110px, transparent 110px),
+      radial-gradient(circle at 50% 60%,  var(--c-orange)  0 60px, transparent 60px),
+      radial-gradient(circle at 30% 92%,  var(--c-violet)  0 50px, transparent 50px),
+      #FFFFFF;
+    opacity:0.10;
+  }
+  .scr > *{position:relative;z-index:1;}
+  .scr.dark{background:#0E1116;color:#fff;}
+
+  /* App header inside screen */
+  .app-top{
+    padding:8px 18px 12px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .app-top .left{display:flex;align-items:center;gap:10px;}
+  .app-top .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,var(--azul),#3056c8);
+    color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;
+  }
+  .app-top .hello{font-size:13px;line-height:1.2;}
+  .app-top .hello b{display:block;font-weight:800;font-size:15px;}
+  .app-top .icon-btn{
+    width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--line);
+    display:grid;place-items:center;
+  }
+
+  /* Hero progress card — for screen 1 */
+  /* Hero progress card — vivid mosaic, not muted gradient */
+  .hero{
+    margin:6px 16px 14px;border-radius:24px;padding:18px;
+    background:
+      radial-gradient(circle at 100% 0%, var(--c-yellow) 0 80px, transparent 80px),
+      radial-gradient(circle at 0% 100%, var(--c-magenta) 0 90px, transparent 90px),
+      radial-gradient(circle at 100% 100%, var(--c-orange) 0 70px, transparent 70px),
+      linear-gradient(150deg, var(--c-violet) 0%, var(--c-blue) 60%, var(--c-teal) 100%);
+    color:#fff;position:relative;overflow:hidden;
+    box-shadow:0 12px 32px rgba(11,16,32,0.28);
+  }
+  .hero::before{
+    content:"";position:absolute;inset:auto -40px -50px auto;width:180px;height:180px;border-radius:50%;
+    background:var(--c-red);mix-blend-mode:screen;opacity:0.5;filter:blur(2px);
+  }
+  .hero .eyebrow{
+    font-family:'JetBrains Mono';font-size:10px;letter-spacing:0.18em;text-transform:uppercase;
+    color:rgba(255,255,255,0.6);
+  }
+  .hero .title{
+    font-family:'Archivo Narrow';font-weight:800;font-size:26px;line-height:1.05;margin-top:6px;letter-spacing:-0.01em;
+  }
+  .hero .title em{font-style:normal;color:var(--oro);}
+  .hero .stats{
+    margin-top:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;
+  }
+  .hero .big{
+    font-family:'Archivo Narrow';font-weight:900;font-size:48px;line-height:1;letter-spacing:-0.02em;
+  }
+  .hero .big small{font-size:18px;font-weight:700;color:rgba(255,255,255,0.5);margin-left:4px;}
+  .hero .right-stat{
+    text-align:right;font-size:11px;color:rgba(255,255,255,0.7);font-family:'JetBrains Mono';
+  }
+  .hero .right-stat b{display:block;color:#fff;font-family:'Archivo';font-size:18px;font-weight:800;}
+  .progress-track{
+    margin-top:14px;height:8px;border-radius:99px;background:rgba(255,255,255,0.12);overflow:hidden;position:relative;
+  }
+  .progress-fill{
+    height:100%;width:62%;
+    background:linear-gradient(90deg,var(--c-yellow), var(--c-orange) 45%, var(--c-magenta) 80%, var(--c-violet));
+    border-radius:99px;position:relative;
+  }
+  .progress-ticks{
+    margin-top:6px;display:flex;justify-content:space-between;
+    font-family:'JetBrains Mono';font-size:9px;color:rgba(255,255,255,0.4);
+  }
+
+  /* Quick actions row */
+  .quick{
+    margin:0 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  }
+  /* Quick actions — saturated tile, not white card */
+  .quick .qa{
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;
+    font-size:10.5px;font-weight:700;color:#1a1a1a;
+  }
+  .quick .qa .ico{
+    width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px;
+    box-shadow:0 4px 10px -4px rgba(0,0,0,0.4);
+  }
+
+  /* Section heading */
+  .section-h{
+    margin:18px 18px 8px;display:flex;align-items:center;justify-content:space-between;
+  }
+  .section-h h3{
+    margin:0;font-family:'Archivo Narrow';font-weight:800;font-size:18px;letter-spacing:-0.005em;
+    white-space:nowrap;
+  }
+  .section-h .more{
+    font-family:'JetBrains Mono';font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);
+  }
+
+  /* Team list — each row carries its team color */
+  .teams{margin:0 16px;display:flex;flex-direction:column;gap:8px;}
+  .team-row{
+    background:#fff;border:1px solid var(--line);border-radius:18px;
+    padding:12px 14px;display:flex;align-items:center;gap:12px;
+    position:relative;overflow:hidden;
+  }
+  .team-row::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--accent, var(--c-blue));
+  }
+  .flag{
+    width:38px;height:38px;border-radius:10px;flex:none;
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:11px;
+    font-family:'Archivo Narrow';letter-spacing:0.02em;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+  }
+  .team-row .meta{flex:1;min-width:0;}
+  .team-row .nm{font-weight:800;font-size:14px;letter-spacing:-0.005em;}
+  .team-row .sub{
+    font-family:'JetBrains Mono';font-size:10.5px;color:var(--muted);margin-top:2px;letter-spacing:0.02em;
+  }
+  .team-row .pct{
+    font-family:'Archivo Narrow';font-weight:800;font-size:18px;letter-spacing:-0.01em;
+  }
+  .team-row .bar{
+    width:64px;height:6px;border-radius:99px;background:#0B0E1310;overflow:hidden;margin-top:4px;
+  }
+  .team-row .bar i{display:block;height:100%;border-radius:99px;background:var(--ink);}
+
+  /* Tab bar */
+  .tabbar{
+    margin-top:auto;display:grid;grid-template-columns:repeat(5,1fr);
+    background:#fff;border-top:1px solid var(--line);
+    padding:8px 8px 14px;
+  }
+  .tabbar .tab{
+    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:700;color:#9a958c;
+    letter-spacing:0.02em;
+  }
+  .tabbar .tab.on{color:var(--ink);}
+  .tabbar .tab .dot{width:24px;height:24px;border-radius:8px;background:#0B0E1308;display:grid;place-items:center;}
+  .tabbar .tab.on .dot{background:var(--oro);color:#0B0E13;}
+
+  /* —— Screen 2: Team detail / Sticker grid —— */
+  .crumb{
+    margin:6px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    font-family:'JetBrains Mono';font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);
+  }
+  .crumb .back{
+    background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 12px;
+    color:var(--ink);font-weight:700;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .team-hero{
+    margin:10px 16px 12px;border-radius:22px;padding:18px;display:flex;align-items:center;gap:14px;
+    background:var(--accent, var(--c-yellow));
+    color:#fff;border:0;position:relative;overflow:hidden;
+    box-shadow:0 8px 20px rgba(11,16,32,0.15);
+  }
+  .team-hero::after{
+    content:"";position:absolute;right:-30px;bottom:-40px;width:140px;height:140px;border-radius:50%;
+    background:rgba(255,255,255,0.18);
+  }
+  .team-hero .flag-lg{
+    width:62px;height:62px;border-radius:14px;flex:none;
+    display:grid;place-items:center;color:#fff;font-weight:900;font-family:'Archivo Narrow';font-size:18px;
+  }
+  .team-hero .info{flex:1;min-width:0;}
+  .team-hero .info .nm{font-family:'Archivo Narrow';font-weight:900;font-size:24px;letter-spacing:-0.01em;line-height:1;color:#fff;}
+  .team-hero .info .grp{
+    margin-top:4px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.85);
+  }
+  .team-hero .ring{
+    width:54px;height:54px;border-radius:50%;flex:none;display:grid;place-items:center;
+    background:conic-gradient(#fff 0 72%, rgba(255,255,255,0.25) 0);
+    position:relative;z-index:1;
+  }
+  .team-hero .ring::after{
+    content:"";position:absolute;inset:5px;border-radius:50%;background:var(--accent, var(--c-yellow));
+  }
+  .team-hero .ring b{position:relative;z-index:1;font-family:'Archivo Narrow';font-weight:800;font-size:14px;color:#fff;}
+
+  .filters{
+    margin:0 16px 12px;display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;
+  }
+  .chip{
+    flex:none;background:#fff;border:1px solid var(--line);border-radius:99px;
+    padding:7px 12px;font-size:11.5px;font-weight:700;color:var(--ink);
+  }
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .chip .n{
+    margin-left:6px;font-family:'JetBrains Mono';font-size:10px;color:var(--muted);
+  }
+  .chip.on .n{color:rgba(255,255,255,0.6);}
+
+  .grid{
+    margin:0 16px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+    align-items:start;
+  }
+  /* Sticker tile — saturated portrait fields */
+  .sticker{
+    aspect-ratio:3/4;border-radius:12px;background:#fff;border:1px solid var(--line);
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+  }
+  .sticker .top{
+    flex:1;display:grid;place-items:center;
+    background:var(--accent, var(--c-blue));
+    position:relative;
+  }
+  .sticker .top .silh{
+    width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,0.92);
+    box-shadow:0 6px 14px -6px rgba(0,0,0,0.4);
+  }
+  .sticker .top .silh.head::before{
+    content:"";display:block;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,0.25);
+    margin:8px auto 0;
+  }
+  .sticker .num{
+    position:absolute;top:6px;left:6px;font-family:'JetBrains Mono';font-size:9px;font-weight:700;
+    color:var(--muted);background:rgba(255,255,255,0.7);padding:2px 5px;border-radius:5px;
+  }
+  .sticker .nm{
+    padding:5px 6px 6px;font-size:10px;font-weight:700;text-align:center;
+    line-height:1.15;letter-spacing:-0.005em;
+    border-top:1px solid var(--line);
+  }
+
+  /* Owned: kept saturated; missing: washed; dup: magenta badge */
+  .sticker.owned .top{background:var(--accent, var(--c-blue));}
+  .sticker.owned .top .silh{background:rgba(255,255,255,0.92);}
+  .sticker.owned .nm{background:#fff;}
+  .sticker.owned .num{background:var(--c-yellow);color:var(--ink);}
+  .sticker.owned::after{
+    content:"";position:absolute;top:6px;right:6px;width:16px;height:16px;border-radius:50%;
+    background:var(--c-yellow);box-shadow:inset 0 0 0 2px #fff;
+  }
+  .sticker.dup .badge-dup{
+    position:absolute;bottom:30px;right:6px;background:var(--c-magenta);color:#fff;
+    font-family:'JetBrains Mono';font-size:9px;font-weight:700;padding:2px 5px;border-radius:5px;letter-spacing:0.04em;
+  }
+  /* Missing — washed but still printed (pale tint of accent) */
+  .sticker.miss .top{
+    background:#F2F1ED;
+  }
+  .sticker.miss .top .silh{background:rgba(13,16,36,0.10);box-shadow:none;}
+  .sticker.miss .top .silh.head::before{background:rgba(13,16,36,0.18);}
+  .sticker.miss .nm{color:var(--muted);}
+  .sticker.miss .num{background:rgba(13,16,36,0.06);color:var(--muted);}
+
+  /* Add CTA tile */
+  .sticker.add{
+    border-style:dashed;border-color:var(--line-strong);background:transparent;
+  }
+  .sticker.add .top{background:transparent;}
+  .sticker.add .plus{font-size:28px;font-weight:300;color:var(--muted);}
+  .sticker.add .nm{color:var(--muted);border-top:1px dashed var(--line-strong);}
+
+  /* —— Screen 3: Trade —— */
+  /* Trade hero — album-cover energy: full-saturation mosaic */
+  .trade-hero{
+    margin:8px 16px 12px;border-radius:22px;padding:18px;
+    background:
+      radial-gradient(circle at 100% 0%, var(--c-yellow) 0 110px, transparent 110px),
+      radial-gradient(circle at 100% 100%, var(--c-orange) 0 90px, transparent 90px),
+      radial-gradient(circle at 0% 100%, var(--c-magenta) 0 90px, transparent 90px),
+      linear-gradient(150deg, var(--c-violet) 0%, var(--c-blue) 50%, var(--c-teal) 100%);
+    color:#fff;
+    position:relative;overflow:hidden;
+    box-shadow:0 12px 32px rgba(11,16,32,0.28);
+  }
+  .trade-hero h3{
+    margin:0;font-family:'Archivo Narrow';font-size:22px;font-weight:900;letter-spacing:-0.01em;
+  }
+  .trade-hero p{
+    margin:4px 0 0;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.4;
+  }
+  .trade-hero .pill{
+    margin-top:12px;display:inline-flex;align-items:center;gap:6px;
+    background:var(--oro);color:#0B0E13;font-weight:800;font-size:12px;
+    padding:8px 12px;border-radius:99px;white-space:nowrap;
+  }
+  .trade-hero .miniglobe{
+    position:absolute;top:-60px;right:-80px;width:160px;height:160px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #2dd4bf, #134e4a 60%, transparent 70%);
+    opacity:0.35;filter:blur(1px);pointer-events:none;
+  }
+  .trade-hero h3, .trade-hero p, .trade-hero .pill{position:relative;z-index:1;}
+  .trade-hero h3{max-width:75%;}
+  .trade-hero p{max-width:78%;}
+
+  .match{
+    margin:0 16px 14px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .match .row1{display:flex;align-items:center;gap:10px;}
+  .match .ava{
+    width:42px;height:42px;border-radius:50%;flex:none;display:grid;place-items:center;
+    color:#fff;font-weight:800;font-size:14px;
+  }
+  .match .who{flex:1;min-width:0;}
+  .match .who .nm{font-weight:800;font-size:14px;}
+  .match .who .sub{
+    font-family:'JetBrains Mono';font-size:10px;color:var(--muted);letter-spacing:0.02em;margin-top:2px;
+  }
+  .match .score{
+    font-family:'Archivo Narrow';font-weight:900;font-size:20px;color:var(--verde);letter-spacing:-0.01em;
+    white-space:nowrap;text-align:right;
+  }
+  .match .score small{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:0.06em;display:block;text-align:right;white-space:nowrap;}
+
+  /* Deal block — 4th-official substitution board metaphor */
+  .match .deal{
+    display:flex;flex-direction:column;
+    background:#0E1426;border-radius:14px;padding:0;
+    position:relative;overflow:hidden;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .match .deal::before{
+    content:"";position:absolute;left:50%;transform:translateX(-50%);
+    top:50%;width:calc(100% - 24px);height:1px;
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.18) 0 6px, transparent 6px 12px);
+  }
+  .deal-side{
+    display:grid;grid-template-columns:32px 1fr;align-items:center;gap:10px;
+    padding:10px 12px;
+  }
+  .deal-side + .deal-side{margin-top:0;}
+  .deal-side .lbl{
+    width:32px;height:32px;border-radius:8px;flex:none;
+    display:grid;place-items:center;
+    background:transparent;border:0;padding:0;
+    writing-mode:initial;transform:none;
+  }
+  .deal-side .lbl svg{display:block;}
+  .deal-side.give .lbl{background:var(--c-red);box-shadow:0 0 0 1px rgba(0,0,0,0.15) inset;}
+  .deal-side.get  .lbl{background:var(--c-green);box-shadow:0 0 0 1px rgba(0,0,0,0.15) inset;}
+  .mini-row{display:flex;gap:5px;flex-wrap:nowrap;align-items:center;min-width:0;}
+  .mini-stk{
+    height:30px;padding:0 8px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+    display:inline-flex;align-items:center;gap:5px;
+    font-family:'Archivo';font-size:11px;font-weight:800;color:#fff;letter-spacing:-0.005em;
+  }
+  .mini-stk .cc{
+    font-family:'Archivo Narrow';font-size:9.5px;font-weight:800;letter-spacing:0.04em;
+    color:rgba(255,255,255,0.6);text-transform:uppercase;
+  }
+  .mini-stk .nm{
+    font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:#fff;
+  }
+  .mini-stk.on{background:var(--c-red);border-color:transparent;color:#fff;}
+  .mini-stk.on .cc{color:rgba(255,255,255,0.85);}
+  .mini-stk.on .nm{color:#fff;}
+  .mini-stk.on2{background:var(--c-green);border-color:transparent;color:#fff;}
+  .mini-stk.on2 .cc{color:rgba(255,255,255,0.85);}
+  .mini-stk.on2 .nm{color:#fff;}
+  .mini-stk .more, .mini-row .more{
+    font-family:'JetBrains Mono';font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);
+    padding:0 2px;letter-spacing:0.04em;
+  }
+  .deal-arrow{display:none;}
+
+  .match .cta{
+    display:flex;gap:6px;
+  }
+  .match .cta button{
+    flex:1;border:0;border-radius:12px;padding:10px;font-family:'Archivo';font-weight:800;font-size:12px;
+    letter-spacing:0.02em;cursor:pointer;
+  }
+  .match .cta .primary{background:var(--ink);color:#fff;}
+  .match .cta .ghost{background:transparent;color:var(--ink);border:1px solid var(--line-strong);}
+
+  /* Compact density */
+  .density-compact .hero{padding:14px;}
+  .density-compact .hero .big{font-size:38px;}
+  .density-compact .team-row{padding:9px 12px;}
+  .density-compact .grid{gap:6px;}
+  .density-compact .sticker .nm{font-size:9px;padding:4px;}
+  .density-compact .quick .qa{padding:8px 4px 6px;}
+
+  /* Footer notes */
+  .notes{
+    width:100%;max-width:1480px;color:rgba(255,255,255,0.55);font-size:13px;line-height:1.6;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:48px;
+    padding-top:32px;border-top:1px solid rgba(255,255,255,0.08);
+  }
+  }
+  .notes h4{
+    margin:0 0 8px;color:#fff;font-family:'Archivo Narrow';font-weight:800;font-size:16px;letter-spacing:-0.005em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .notes h4 i{
+    width:18px;height:18px;border-radius:5px;background:var(--oro);color:#0B0E13;display:grid;place-items:center;
+    font-style:normal;font-family:'Archivo';font-size:11px;font-weight:800;
+  }
+  .notes ul{margin:0;padding-left:18px;}
+  .notes li{margin-bottom:4px;}
+  .notes code{font-family:'JetBrains Mono';font-size:12px;color:#fff;background:rgba(255,255,255,0.06);padding:1px 5px;border-radius:4px;}
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React + Babel -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="components/ios-frame.jsx"></script>
+  <script type="text/babel" src="components/tweaks-panel.jsx"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    /* ── Editable defaults (Tweaks-persisted) ───────────────────── */
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "accent": "vino",
+      "showHero": true,
+      "userName": "Diego"
+    }/*EDITMODE-END*/;
+
+    /* ── Data ──────────────────────────────────────────────────── */
+    const TEAMS = [
+      { code:'BRA', name:'Brasil',    group:'F', pct:88, owned:16, total:18, c1:'#FFDF00', c2:'#009C3B', accent:true, p:'var(--c-yellow)' },
+      { code:'ARG', name:'Argentina', group:'C', pct:55, owned:10, total:18, c1:'#75AADB', c2:'#FFFFFF', p:'var(--c-blue)' },
+      { code:'FRA', name:'Francia',   group:'B', pct:72, owned:13, total:18, c1:'#0055A4', c2:'#EF4135', p:'var(--c-red)' },
+      { code:'MEX', name:'México',    group:'A', pct:33, owned:6,  total:18, c1:'#006847', c2:'#CE1126', p:'var(--c-green)' },
+      { code:'USA', name:'Estados Unidos', group:'A', pct:22, owned:4, total:18, c1:'#3C3B6E', c2:'#B22234', p:'var(--c-violet)' },
+      { code:'ESP', name:'España',    group:'H', pct:61, owned:11, total:18, c1:'#C60B1E', c2:'#FFC400', p:'var(--c-orange)' },
+    ];
+
+    /* Rotate sticker accent through the 8 mosaic colors */
+    const STK_PALETTE = ['var(--c-yellow)','var(--c-orange)','var(--c-red)','var(--c-magenta)','var(--c-violet)','var(--c-blue)','var(--c-teal)','var(--c-green)'];
+
+    const VEN_PLAYERS = [
+      { n:'001', name:'Jugador 01',  state:'owned' },
+      { n:'002', name:'Jugador 02',  state:'owned', dup:2 },
+      { n:'003', name:'Jugador 03',  state:'owned' },
+      { n:'004', name:'Jugador 04',  state:'owned', dup:1 },
+      { n:'005', name:'Jugador 05',  state:'miss' },
+      { n:'006', name:'Jugador 06',  state:'owned' },
+      { n:'007', name:'Jugador 07',  state:'owned' },
+      { n:'008', name:'Jugador 08',  state:'miss' },
+      { n:'009', name:'Jugador 09',  state:'owned' },
+      { n:'010', name:'Jugador 10',  state:'miss' },
+      { n:'011', name:'Jugador 11',  state:'owned' },
+      { n:'012', name:'Jugador 12',  state:'add' },
+    ];
+
+    const MATCHES = [
+      { name:'Andrés P.', loc:'2.4 km · cerca', score:'9 ↔ 7', av:'#B0263C',
+        give:[ ['ARG-04','on'], ['BRA-12','on'], ['ESP-09','on'] ],
+        get: [ ['FRA-05','on2'],['FRA-10','on2'],['FRA-08','on2'] ] },
+      { name:'María G.',  loc:'online · verificada',score:'6 ↔ 6', av:'#1F3A8A',
+        give:[ ['MEX-02','on'], ['USA-11','on'] ],
+        get: [ ['ITA-08','on2'],['BRA-03','on2'] ] },
+      { name:'Luis R.',   loc:'18 km · mismo grupo', score:'4 ↔ 5', av:'#2F7A4D',
+        give:[ ['ITA-07','on'] ],
+        get: [ ['POR-10','on2'] ] },
+    ];
+
+    /* ── Small UI atoms ────────────────────────────────────────── */
+    const Flag = ({t, big}) => (
+      <div className={big ? 'flag-lg' : 'flag'} style={{
+        background:`linear-gradient(135deg, ${t.c1} 0 50%, ${t.c2} 50% 100%)`
+      }}>{t.code}</div>
+    );
+
+    const TabBar = ({active='home'}) => (
+      <div className="tabbar">
+        {[
+          ['home','Álbum','▦'],
+          ['teams','Equipos','◉'],
+          ['trade','Trueque','⇄'],
+          ['scan','Escanear','⊕'],
+          ['me','Yo','◍'],
+        ].map(([k,l,g])=>(
+          <div key={k} className={'tab '+(active===k?'on':'')}>
+            <div className="dot">{g}</div>
+            <div>{l}</div>
+          </div>
+        ))}
+      </div>
+    );
+
+    /* ── Screen 1: Album home ──────────────────────────────────── */
+    function ScreenAlbum({ tw }){
+      const greet = tw.language==='en' ? 'Hey, ' : 'Hola, ';
+      return (
+        <div className={'scr density-'+tw.density}>
+          <div className="app-top">
+            <div className="left">
+              <div className="avatar">{tw.userName?.[0] || 'C'}</div>
+              <div className="hello">
+                {greet}<b>{tw.userName}</b>
+                <span style={{color:'var(--muted)',fontSize:11,fontFamily:'JetBrains Mono'}}>
+                  {tw.language==='en' ? 'world cup 2026' : 'mundial 2026 · día 142'}
+                </span>
+              </div>
+            </div>
+            <div className="icon-btn" aria-label="search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B0E13" strokeWidth="2.4" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+              </svg>
+            </div>
+          </div>
+
+          {tw.showHero && (
+            <div className="hero">
+              <div className="eyebrow">{tw.language==='en' ? 'Your album · Mi Pana 26' : 'Tu álbum · Mi Pana 26'}</div>
+              <div className="title">
+                Vas <em>bien encaminado</em>,<br/>{tw.userName}.
+              </div>
+              <div className="stats">
+                <div className="big">419<small>/672</small></div>
+                <div className="right-stat">
+                  <b>62%</b>
+                  {tw.language==='en' ? 'completed' : 'completado'}
+                </div>
+              </div>
+              <div className="progress-track"><div className="progress-fill"/></div>
+              <div className="progress-ticks">
+                <span>0</span><span>168</span><span>336</span><span>504</span><span>672</span>
+              </div>
+            </div>
+          )}
+
+          <div className="quick">
+            <div className="qa"><div className="ico" style={{background:'var(--vino)'}}>＋</div>{tw.language==='en'?'Add':'Agregar'}</div>
+            <div className="qa"><div className="ico" style={{background:'var(--azul)'}}>⇄</div>{tw.language==='en'?'Trade':'Cambiar'}</div>
+            <div className="qa"><div className="ico" style={{background:'var(--verde)'}}>◐</div>{tw.language==='en'?'Wishlist':'Faltan'}</div>
+            <div className="qa"><div className="ico" style={{background:'#0B0E13'}}>⌘</div>{tw.language==='en'?'Scan':'Scanear'}</div>
+          </div>
+
+          <div className="section-h">
+            <h3>{tw.language==='en' ? 'Teams' : 'Equipos'}</h3>
+            <div className="more">{tw.language==='en' ? 'See all (48)' : 'Ver todos (48)'}</div>
+          </div>
+
+          <div className="teams">
+            {TEAMS.slice(0,5).map(t=>(
+              <div key={t.code} className="team-row" style={{['--accent']: t.p}}>
+                <Flag t={t}/>
+                <div className="meta">
+                  <div className="nm">{t.name}</div>
+                  <div className="sub">GRUPO {t.group} · {t.owned}/{t.total}</div>
+                  <div className="bar"><i style={{width:t.pct+'%', background: t.p}}/></div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div className="pct">{t.pct}<span style={{fontSize:11,color:'var(--muted)'}}>%</span></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <TabBar active="home"/>
+        </div>
+      );
+    }
+
+    /* ── Screen 2: Team detail ─────────────────────────────────── */
+    function ScreenTeam({ tw }){
+      const ven = TEAMS[0]; // featured team in demo
+      return (
+        <div className={'scr density-'+tw.density}>
+          <div className="app-top" style={{paddingTop:6}}>
+            <div className="crumb" style={{margin:0,flex:1,display:'flex'}}>
+              <div className="back">← {tw.language==='en' ? 'Album' : 'Álbum'}</div>
+              <div>03 / 48</div>
+            </div>
+          </div>
+
+          <div className="team-hero" style={{['--accent']: ven.p}}>
+            <Flag t={ven} big/>
+            <div className="info">
+              <div className="nm">{ven.name}</div>
+              <div className="grp">{tw.language==='en' ? 'Group' : 'Grupo'} {ven.group} · 18 {tw.language==='en'?'cards':'cromos'}</div>
+            </div>
+            <div className="ring"><b>{ven.pct}%</b></div>
+          </div>
+
+          <div className="filters">
+            <div className="chip on">{tw.language==='en'?'All':'Todos'}<span className="n">18</span></div>
+            <div className="chip">{tw.language==='en'?'Owned':'Tengo'}<span className="n">14</span></div>
+            <div className="chip">{tw.language==='en'?'Missing':'Faltan'}<span className="n">3</span></div>
+            <div className="chip">{tw.language==='en'?'Duplicates':'Repetidos'}<span className="n">2</span></div>
+            <div className="chip">{tw.language==='en'?'Legendary':'Leyenda'}<span className="n">1</span></div>
+          </div>
+
+          <div className="grid">
+            {VEN_PLAYERS.map((p,i)=>{
+              const accent = STK_PALETTE[i % STK_PALETTE.length];
+              if (p.state==='add') return (
+                <div key={p.n} className="sticker add">
+                  <div className="top"><div className="plus">＋</div></div>
+                  <div className="nm">{tw.language==='en'?'Add':'Agregar'}</div>
+                </div>
+              );
+              return (
+                <div key={p.n} className={'sticker '+(p.state)+(p.dup?' dup':'')} style={{['--accent']:accent}}>
+                  <div className="num">{p.n}</div>
+                  <div className="top"><div className="silh head"/></div>
+                  {p.dup && <div className="badge-dup">×{p.dup+1}</div>}
+                  <div className="nm">{p.name}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          <TabBar active="teams"/>
+        </div>
+      );
+    }
+
+    /* ── Screen 3: Trade ───────────────────────────────────────── */
+    function ScreenTrade({ tw }){
+      return (
+        <div className={'scr density-'+tw.density}>
+          <div className="app-top">
+            <div className="left">
+              <div className="hello"><b style={{fontSize:18,fontFamily:'Archivo Narrow'}}>{tw.language==='en'?'Trade':'Trueques'}</b>
+              <span style={{color:'var(--muted)',fontSize:11,fontFamily:'JetBrains Mono'}}>
+                {tw.language==='en'?'12 nearby matches':'12 panas cerca de ti'}
+              </span></div>
+            </div>
+            <div className="icon-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B0E13" strokeWidth="2.4" strokeLinecap="round">
+                <path d="M3 6h18M6 12h12M10 18h4"/>
+              </svg>
+            </div>
+          </div>
+
+          <div className="trade-hero">
+            <div className="miniglobe"/>
+            <h3>{tw.language==='en'?'Swap your duplicates.':'Cambia tus repetidos.'}</h3>
+            <p>{tw.language==='en'
+              ? 'You have 47 duplicates that 23 collectors near you want.'
+              : 'Tienes 47 repetidos que 23 panas cerca de ti están buscando.'}</p>
+            <div className="pill">⇄ {tw.language==='en'?'Find a match':'Buscar un match'}</div>
+          </div>
+
+          <div className="section-h" style={{marginTop:6}}>
+            <h3>{tw.language==='en'?'Best matches':'Mejores matches'}</h3>
+            <div className="more">{tw.language==='en'?'Filter':'Filtrar'}</div>
+          </div>
+
+          {MATCHES.map((m,i)=>(
+            <div key={i} className="match">
+              <div className="row1">
+                <div className="ava" style={{background:m.av}}>{m.name[0]}</div>
+                <div className="who">
+                  <div className="nm">{m.name}</div>
+                  <div className="sub">{m.loc}</div>
+                </div>
+                <div className="score">{m.score}<small>{tw.language==='en'?'cards':'cromos'}</small></div>
+              </div>
+              <div className="deal">
+                <div className="deal-side give">
+                  <div className="lbl" aria-label={tw.language==='en'?'Out':'Sale'}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 4v15"/><path d="M5 13l7 7 7-7"/>
+                    </svg>
+                  </div>
+                  <div className="mini-row">
+                    {m.give.slice(0,2).map((s,j)=>{
+                      const [cc,num] = s[0].split('-');
+                      return (
+                        <div key={j} className={'mini-stk '+s[1]}>
+                          <span className="cc">{cc}</span>
+                          <span className="nm">{num}</span>
+                        </div>
+                      );
+                    })}
+                    {m.give.length>2 && <span className="more">+{m.give.length-2}</span>}
+                  </div>
+                </div>
+                <div className="deal-side get">
+                  <div className="lbl" aria-label={tw.language==='en'?'In':'Entra'}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 20V5"/><path d="M5 11l7-7 7 7"/>
+                    </svg>
+                  </div>
+                  <div className="mini-row">
+                    {m.get.slice(0,2).map((s,j)=>{
+                      const [cc,num] = s[0].split('-');
+                      return (
+                        <div key={j} className={'mini-stk '+s[1]}>
+                          <span className="cc">{cc}</span>
+                          <span className="nm">{num}</span>
+                        </div>
+                      );
+                    })}
+                    {m.get.length>2 && <span className="more">+{m.get.length-2}</span>}
+                  </div>
+                </div>
+              </div>
+              <div className="cta">
+                <button className="primary">{tw.language==='en'?'Propose trade':'Proponer cambio'}</button>
+                <button className="ghost">{tw.language==='en'?'Chat':'Chat'}</button>
+              </div>
+            </div>
+          ))}
+
+          <TabBar active="trade"/>
+        </div>
+      );
+    }
+
+    /* ── Composition ───────────────────────────────────────────── */
+    function App(){
+      const [tweaks, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+
+      return (
+        <div className="stage" data-screen-label="Mi Pana 26 redesign">
+          <div className="header">
+            <div className="brand">
+              <div className="brand-mark">MP</div>
+              <div>
+                <div className="brand-name">Mi Pana 26 — redesign</div>
+                <div className="brand-sub">tu álbum mundial · una versión más simple e intuitiva</div>
+              </div>
+            </div>
+            <div className="header-meta">
+              <b>3 pantallas</b> · álbum, equipo, trueque<br/>
+              mobile-first · español por defecto<br/>
+              <span style={{color:'var(--oro)'}}>activa Tweaks</span> para temas y densidad
+            </div>
+          </div>
+
+          <div className="row">
+            <div className="phone-card" data-screen-label="01 Album home">
+              <div className="phone-label"><span className="num">1</span> Álbum · vista general</div>
+              <window.IOSDevice width={360} height={760} keyboard={false} title={undefined}>
+                <ScreenAlbum tw={tweaks}/>
+              </window.IOSDevice>
+              <div className="phone-caption">
+                Una sola pantalla responde a “¿cómo voy?”, “¿qué me falta?”, “¿qué hago ahora?”.
+                Progreso grande arriba, acciones rápidas, equipos ordenados por prioridad.
+              </div>
+            </div>
+
+            <div className="phone-card" data-screen-label="02 Team detail">
+              <div className="phone-label"><span className="num">2</span> Equipo · cromos</div>
+              <window.IOSDevice width={360} height={760} keyboard={false} title={undefined}>
+                <ScreenTeam tw={tweaks}/>
+              </window.IOSDevice>
+              <div className="phone-caption">
+                Grilla 3 columnas. Tengo / faltan / repetidos en colores claros — sin texto que adivinar.
+                El número del cromo siempre visible para el toque rápido.
+              </div>
+            </div>
+
+            <div className="phone-card" data-screen-label="03 Trade matches">
+              <div className="phone-label"><span className="num">3</span> Trueque · matches</div>
+              <window.IOSDevice width={360} height={760} keyboard={false} title={undefined}>
+                <ScreenTrade tw={tweaks}/>
+              </window.IOSDevice>
+              <div className="phone-caption">
+                Match estilo Tinder pero con la oferta visible: lo que das ↔ lo que recibes,
+                con cromos reales. Una decisión, dos botones.
+              </div>
+            </div>
+          </div>
+
+          <div className="notes">
+            <div>
+              <h4><i>1</i> Qué cambia</h4>
+              <ul>
+                <li>Una <b>jerarquía clara</b>: progreso → acciones → equipos.</li>
+                <li>Estados de cromo <b>visuales</b>, no texto: relleno = lo tengo, gris = falta, badge azul = repetido.</li>
+                <li>Tab bar de 5 ítems con la acción que más importa: <code>⇄ Trueque</code>.</li>
+              </ul>
+            </div>
+            <div>
+              <h4><i>2</i> Sistema</h4>
+              <ul>
+                <li>Tipografía: <b>Archivo Narrow</b> para titulares deportivos, <b>Archivo</b> para cuerpo, <b>JetBrains Mono</b> para metadatos.</li>
+                <li>Color: paleta vibrante del álbum oficial — <code>#FFC83D</code> · <code>#FF7A3D</code> · <code>#E8324C</code> · <code>#D63384</code> · <code>#7A4DD6</code> · <code>#2E5CE6</code> · <code>#1FB8B0</code> · <code>#2BB673</code>, sobre papel <code>#FFF</code> y tinta <code>#11142A</code>.</li>
+                <li>Radios suaves (12–24px), sombras mínimas, mucho aire.</li>
+              </ul>
+            </div>
+            <div>
+              <h4><i>3</i> Próximos pasos</h4>
+              <ul>
+                <li>Detalle del cromo (foto del jugador real, historial de cambios).</li>
+                <li>Flujo de <b>escanear</b> con cámara para añadir cromos.</li>
+                <li>Perfil + reputación de trueque (estrellas, cambios completados).</li>
+                <li>¿Quieres que explore una versión con <b>tema oscuro</b> o estilo <b>“carta coleccionable”</b>?</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    /* ── Tweaks panel ─────────────────────────────────────────── */
+    function Panel(){
+      const [tweaks, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+      const T = window;
+      return (
+        <T.TweaksPanel title="Tweaks">
+          <T.TweakSection title="Identidad">
+            <T.TweakText label="Nombre del usuario" value={tweaks.userName}
+              onChange={v=>setTweak('userName', v)}/>
+            <T.TweakRadio label="Idioma" value={tweaks.language}
+              options={[['es','Español'],['en','English']]}
+              onChange={v=>setTweak('language', v)}/>
+          </T.TweakSection>
+          <T.TweakSection title="Densidad">
+            <T.TweakRadio label="Espaciado" value={tweaks.density}
+              options={[['comfortable','Cómodo'],['compact','Compacto']]}
+              onChange={v=>setTweak('density', v)}/>
+            <T.TweakToggle label="Mostrar tarjeta de progreso" value={tweaks.showHero}
+              onChange={v=>setTweak('showHero', v)}/>
+          </T.TweakSection>
+        </T.TweaksPanel>
+      );
+    }
+
+    /* ── Mount ────────────────────────────────────────────────── */
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<><App/><Panel/></>);
+  </script>
+</body>
+</html>

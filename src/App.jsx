@@ -42,7 +42,7 @@ export default function App() {
   }
 
   return (
-    <AlbumOverviewScreen collection={collection} lang={lang} userName={userName}
+    <AlbumOverviewScreen collection={collection} setSticker={setSticker} lang={lang} userName={userName}
       onSelectTeam={handleSelectTeam} onNavigate={handleNavigate} />
   );
 }

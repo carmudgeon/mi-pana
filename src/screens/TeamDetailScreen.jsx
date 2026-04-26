@@ -79,7 +79,7 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
         </button>
       </div>
 
-      <div style={{ margin: '0 var(--screen-margin) 12px', display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+      <div className="hide-scrollbar" style={{ margin: '0 var(--screen-margin) 12px', display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
         <FilterChip label={t(lang, 'filterAll')} count={counts.all} active={filter === 'all'} onClick={() => setFilter('all')} />
         <FilterChip label={t(lang, 'filterOwned')} count={counts.owned} active={filter === 'owned'} onClick={() => setFilter('owned')} />
         <FilterChip label={t(lang, 'filterMissing')} count={counts.miss} active={filter === 'miss'} onClick={() => setFilter('miss')} />

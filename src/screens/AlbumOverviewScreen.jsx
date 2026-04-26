@@ -119,7 +119,7 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
       </div>
 
       {/* Confederation filter */}
-      <div style={{ margin: '0 var(--screen-margin) 10px', display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
+      <div className="hide-scrollbar" style={{ margin: '0 var(--screen-margin) 10px', display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 2 }}>
         {CONFEDS.map(c => (
           <button
             key={c.code}

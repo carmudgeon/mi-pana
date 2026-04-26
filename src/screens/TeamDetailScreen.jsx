@@ -99,7 +99,7 @@ export default function TeamDetailScreen({ team, collection, setSticker, lang, o
             onDecrement={() => setSticker(s.id, Math.max(0, s.qty - 1))}
           />
         ))}
-        <Sticker state="add" index={filtered.length} addLabel={t(lang, 'add')} sticker={{}} />
+
       </div>
 
       <TabBar active="teams" onNavigate={onNavigate} />

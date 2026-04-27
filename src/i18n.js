@@ -67,7 +67,7 @@ const strings = {
     fullGrid: 'Todos los cromos',
     albumComplete: 'Álbum completo',
     heroPhrase0: (name) => `¡Vamo a darle, ${name}!`,
-    heroPhrase0em: 'tu aventura',
+    heroPhrase0em: 'a darle',
     heroPhrase5: (name) => `Buen comienzo, ${name}.`,
     heroPhrase5em: 'Buen comienzo',
     heroPhrase15: (name) => `Vas tomando ritmo, ${name}.`,

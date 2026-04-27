@@ -4,6 +4,7 @@ import DealSide from '../components/DealSide.jsx';
 import QrGenerator from '../components/QrGenerator.jsx';
 import QrScanner from '../components/QrScanner.jsx';
 import TabBar from '../components/TabBar.jsx';
+import { countDuplicates } from '../utils/qrCodec.js';
 import { t } from '../i18n.js';
 import '../screens/ScanScreen.css';
 
@@ -78,6 +79,7 @@ const TABS = [
 
 export default function TradeMatchesScreen({ lang, collection, trades, onAcceptTrade, onRejectTrade, onProposeTrade, onNavigate }) {
   const [activeTab, setActiveTab] = useState('trades');
+  const dupCount = countDuplicates(collection);
 
   const handlePropose = (proposal) => {
     onProposeTrade?.(proposal);
@@ -88,9 +90,11 @@ export default function TradeMatchesScreen({ lang, collection, trades, onAcceptT
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ padding: '8px 18px 12px' }}>
         <b style={{ display: 'block', fontSize: 18, fontFamily: 'var(--font-display)' }}>{t(lang, 'tradeTitle')}</b>
-        <span style={{ color: 'var(--muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>
-          {trades.length > 0 ? `${trades.length} ${trades.length === 1 ? 'trueque' : 'trueques'}` : ''}
-        </span>
+        {trades.length > 0 && (
+          <span style={{ color: 'var(--muted)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>
+            {trades.length} {trades.length === 1 ? 'trueque' : 'trueques'}
+          </span>
+        )}
       </div>
 
       {/* Sub-tabs */}
@@ -109,7 +113,7 @@ export default function TradeMatchesScreen({ lang, collection, trades, onAcceptT
       <div style={{ flex: 1, paddingBottom: 16 }}>
         {activeTab === 'trades' && (
           <>
-            <TradeHero title={t(lang, 'tradeHeroTitle')} body={t(lang, 'tradeHeroBody', 47, 23)}
+            <TradeHero title={t(lang, 'tradeHeroTitle')} body={t(lang, 'tradeHeroBody', dupCount)}
               ctaLabel={t(lang, 'scanTab')} onCtaClick={() => setActiveTab('scan')} />
 
             <div style={{ margin: '6px 18px 12px' }}>

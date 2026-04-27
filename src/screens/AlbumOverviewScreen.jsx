@@ -16,7 +16,33 @@ const CONFEDS = [
   { code: 'OFC', label: 'OFC', color: 'var(--c-orange)' },
 ];
 
-export default function AlbumOverviewScreen({ collection, setSticker, lang, userName, onSelectTeam, onNavigate }) {
+function getHeroPhrase(lang, pct, trades, userName) {
+  if (trades > 0 && pct < 5) {
+    return { phrase: t(lang, 'heroFirstTrade', userName), em: t(lang, 'heroFirstTradeem') };
+  }
+
+  const thresholds = [
+    [100, 'heroPhrase100'],
+    [95, 'heroPhrase95'],
+    [85, 'heroPhrase85'],
+    [70, 'heroPhrase70'],
+    [50, 'heroPhrase50'],
+    [30, 'heroPhrase30'],
+    [15, 'heroPhrase15'],
+    [5, 'heroPhrase5'],
+    [0, 'heroPhrase0'],
+  ];
+
+  for (const [threshold, key] of thresholds) {
+    if (pct >= threshold) {
+      return { phrase: t(lang, key, userName), em: t(lang, key + 'em') };
+    }
+  }
+
+  return { phrase: t(lang, 'heroPhrase0', userName), em: t(lang, 'heroPhrase0em') };
+}
+
+export default function AlbumOverviewScreen({ collection, setSticker, lang, userName, trades = [], onSelectTeam, onNavigate }) {
   const [search, setSearch] = useState('');
   const [confedFilter, setConfedFilter] = useState('ALL');
 
@@ -77,7 +103,8 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
       </div>
 
       <Hero owned={totalOwned} total={totalStickers} pct={pct} userName={userName}
-        eyebrow={t(lang, 'albumEyebrow')} completedLabel={t(lang, 'completed')} />
+        eyebrow={t(lang, 'albumEyebrow')} completedLabel={t(lang, 'completed')}
+        {...getHeroPhrase(lang, pct, trades.length, userName)} />
 
       <div style={{ margin: '0 var(--screen-margin)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
         <QuickAction glyph="✓✓" label={t(lang, 'addAction')} color="var(--c-red)" onClick={() => {

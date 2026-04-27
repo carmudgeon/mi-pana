@@ -82,6 +82,6 @@ export default function App() {
 
   return (
     <AlbumOverviewScreen collection={collection} setSticker={setSticker} lang={lang} userName={userName}
-      onSelectTeam={handleSelectTeam} onNavigate={handleNavigate} />
+      trades={trades} onSelectTeam={handleSelectTeam} onNavigate={handleNavigate} />
   );
 }

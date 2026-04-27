@@ -3,7 +3,7 @@ const strings = {
     greeting: 'Hola,',
     subtitle: 'Mundial 2026',
     albumEyebrow: 'TU ÁLBUM · MI PANA 26',
-    heroTitle: (name) => `Vas bien encaminado, ${name}.`,
+    heroTitle: (name) => `Vamooos, ${name}.`,
     heroTitleEm: 'bien encaminado',
     completed: 'completado',
     addAction: 'Completar',

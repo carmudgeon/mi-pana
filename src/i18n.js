@@ -67,7 +67,7 @@ const strings = {
     acceptTrade: 'Aceptar trueque',
     fullGrid: 'Todos los cromos',
     albumComplete: 'Álbum completo',
-    heroPhrase0: (name) => `¡Empieza tu aventura, ${name}!`,
+    heroPhrase0: (name) => `¡Vamo a darle, ${name}!`,
     heroPhrase0em: 'tu aventura',
     heroPhrase5: (name) => `Buen comienzo, ${name}.`,
     heroPhrase5em: 'Buen comienzo',

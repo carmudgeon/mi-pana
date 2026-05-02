@@ -6,39 +6,23 @@
     <title>Mi Pana 26 · Tu Álbum Mundial</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚽%3C/text%3E%3C/svg%3E" />
 
-    <!-- Security headers (GitHub Pages doesn't support server-side headers,
-         so we use meta equivalents where possible) -->
+    <!--
+      Security headers — GitHub Pages does not support custom HTTP headers.
+      The service worker (sw.js) injects the real HTTP headers that browsers
+      require on the response (X-Frame-Options, frame-ancestors CSP, etc.).
+      The meta tags below act as a fallback for browsers without SW support.
+    -->
 
-    <!-- Prevent MIME-type sniffing -->
+    <!-- Prevent MIME-type sniffing (meta fallback; SW sets the real header) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
 
-    <!-- Block the page from being embedded in iframes (clickjacking) -->
-    <meta http-equiv="X-Frame-Options" content="DENY" />
-
-    <!-- Content Security Policy:
-         - default-src 'self'          — only load resources from this origin
-         - script-src 'self'           — no inline scripts (Vite injects hashed modules)
-         - style-src 'self' 'unsafe-inline' — inline styles needed for React style props
-         - connect-src 'self' https://*.supabase.co wss://*.supabase.co
-                                       — allow Supabase REST + Realtime WebSocket
-         - img-src 'self' data:        — allow data: URIs for the SVG favicon
-         - font-src 'self'             — no external fonts
-         - object-src 'none'           — block Flash / plugins
-         - base-uri 'self'             — prevent base tag injection
-         - form-action 'self'          — forms can only submit to this origin
+    <!--
+      Content Security Policy meta fallback.
+      Note: frame-ancestors is intentionally omitted here — browsers ignore
+      it in meta tags. The SW sets it as a real HTTP header instead.
     -->
     <meta http-equiv="Content-Security-Policy"
-      content="
-        default-src 'self';
-        script-src 'self';
-        style-src 'self' 'unsafe-inline';
-        connect-src 'self' https://*.supabase.co wss://*.supabase.co;
-        img-src 'self' data:;
-        font-src 'self';
-        object-src 'none';
-        base-uri 'self';
-        form-action 'self';
-      " />
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" />
 
     <!-- Don't send Referer header to third-party origins -->
     <meta name="referrer" content="strict-origin-when-cross-origin" />
@@ -46,5 +30,13 @@
   <body style="margin: 0; background: #FFFFFF;">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <!-- Register security-headers service worker -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/mi-pana/sw.js');
+        });
+      }
+    </script>
   </body>
 </html>

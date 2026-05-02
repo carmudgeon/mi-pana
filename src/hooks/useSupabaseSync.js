@@ -210,18 +210,37 @@ export default function useSupabaseSync(key, defaultValue, options = {}) {
   useEffect(() => {
     if (!user) return; // no session — no Realtime (Req 12.3)
 
-    const channelName = `useSupabaseSync:${user.id}:${key}`;
-    const channel = supabase.channel(channelName);
-
-    channel
-      .on('broadcast', { event: 'state-update' }, ({ payload }) => {
-        if (!payload?.state) return;
-        const remote = payload.state;
-        const local = stateRef.current;
-        const merged = applyMerge(local, remote);
-        writeLocalStorage(merged);
-        setStateInternal(merged);
-      })
+    // Listen to Postgres Changes on the collections table for this user.
+    // This fires whenever another device upserts a row, giving us real-time
+    // cross-device sync without needing to broadcast manually.
+    const channelName = `collections:${user.id}:${key}`;
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',           // INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'collections',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // Re-fetch the full collection on any change rather than trying to
+          // apply individual row diffs — simpler and avoids partial-state bugs.
+          supabase
+            .from('collections')
+            .select('sticker_id, quantity')
+            .eq('user_id', user.id)
+            .then(({ data, error }) => {
+              if (error || !data) return;
+              const remote = rowsToCollection(data);
+              const local = stateRef.current;
+              const merged = applyMerge(local, remote);
+              writeLocalStorage(merged);
+              setStateInternal(merged);
+            });
+        },
+      )
       .subscribe();
 
     return () => {

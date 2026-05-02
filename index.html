@@ -31,12 +31,6 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <!-- Register security-headers service worker -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/mi-pana/sw.js');
-        });
-      }
-    </script>
+    <script src="/mi-pana/register-sw.js"></script>
   </body>
 </html>

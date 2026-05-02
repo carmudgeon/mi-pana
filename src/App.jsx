@@ -16,7 +16,7 @@ export default function App() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const lang = 'es';
-  const userName = user?.user_metadata?.username ?? user?.email?.split('@')[0] ?? 'Diego';
+  const userName = user?.user_metadata?.username ?? user?.email?.split('@')[0] ?? 'Panita';
 
   const setSticker = (id, qty) => {
     setCollection(prev => {

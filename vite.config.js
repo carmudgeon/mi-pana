@@ -7,6 +7,9 @@ export default defineConfig({
 
   // ── Production build optimisations ──────────────────────────────────────────
   build: {
+    // Never inline assets as data: URIs — emit all files so CSP font-src/img-src
+    // 'self' covers them without needing to allow data: URIs.
+    assetsInlineLimit: 0,
     // Target modern browsers — smaller output, no legacy polyfills
     target: 'es2020',
     // Warn when a chunk exceeds 500 kB

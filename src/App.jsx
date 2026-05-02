@@ -1,23 +1,29 @@
 import React, { useState } from 'react';
-import usePersistentState from './hooks/usePersistentState.js';
+import useSupabaseSync from './hooks/useSupabaseSync.js';
+import { mergeCollections } from './utils/mergeCollections.js';
+import { useAuth } from './context/useAuth.js';
 import AlbumOverviewScreen from './screens/AlbumOverviewScreen.jsx';
 import TeamDetailScreen from './screens/TeamDetailScreen.jsx';
 import TradeMatchesScreen from './screens/TradeMatchesScreen.jsx';
 import FullGridScreen from './screens/FullGridScreen.jsx';
+import AuthModal from './components/AuthModal.jsx';
 
 export default function App() {
-  const [collection, setCollection] = usePersistentState('panini2026-collection', {});
-  const [trades, setTrades] = usePersistentState('panini2026-trades', []);
+  const { user } = useAuth();
+  const [collection, setCollection] = useSupabaseSync('panini2026-collection', {}, { mergeFn: mergeCollections });
+  const [trades, setTrades] = useSupabaseSync('panini2026-trades', []);
   const [view, setView] = useState('home');
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const lang = 'es';
-  const userName = 'Diego';
+  const userName = user?.user_metadata?.username ?? user?.email?.split('@')[0] ?? 'Diego';
 
   const setSticker = (id, qty) => {
     setCollection(prev => {
       const next = { ...prev };
-      if (qty <= 0) delete next[id];
-      else next[id] = qty;
+      // Soft-delete: keep the key with quantity 0 so Supabase stays in sync.
+      // The local collection object uses 0 to mean "not owned".
+      next[id] = Math.max(0, qty);
       return next;
     });
   };
@@ -81,7 +87,11 @@ export default function App() {
   }
 
   return (
-    <AlbumOverviewScreen collection={collection} setSticker={setSticker} lang={lang} userName={userName}
-      trades={trades} onSelectTeam={handleSelectTeam} onNavigate={handleNavigate} />
+    <>
+      <AlbumOverviewScreen collection={collection} setSticker={setSticker} lang={lang} userName={userName}
+        trades={trades} onSelectTeam={handleSelectTeam} onNavigate={handleNavigate}
+        isGuest={!user} onSignInClick={() => setAuthModalOpen(true)} />
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+    </>
   );
 }

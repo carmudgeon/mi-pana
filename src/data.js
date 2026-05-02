@@ -73,9 +73,11 @@ export function getStickerAccent(index) {
   return MOSAIC_COLORS[index % MOSAIC_COLORS.length];
 }
 
+export const STICKERS_PER_TEAM = 20;
+
 export function buildTeamStickers(teamCode) {
   const stickers = [];
-  for (let i = 1; i <= 18; i++) {
+  for (let i = 1; i <= STICKERS_PER_TEAM; i++) {
     stickers.push({
       id: `${teamCode}-${String(i).padStart(2, '0')}`,
       code: teamCode,

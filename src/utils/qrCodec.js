@@ -1,9 +1,9 @@
 import { TEAMS } from '../data.js';
 
 const PREFIX = 'MP26';
-const STICKERS_PER_TEAM = 18;
-const TOTAL_BITS = TEAMS.length * STICKERS_PER_TEAM; // 864
-const BYTES_PER_MAP = Math.ceil(TOTAL_BITS / 8); // 108
+const STICKERS_PER_TEAM = 20;
+const TOTAL_BITS = TEAMS.length * STICKERS_PER_TEAM; // 960
+const BYTES_PER_MAP = Math.ceil(TOTAL_BITS / 8); // 120
 
 function allStickerIds() {
   const ids = [];

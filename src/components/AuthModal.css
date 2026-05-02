@@ -1,0 +1,229 @@
+/* AuthModal — centered overlay with backdrop */
+
+.auth-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(11, 16, 32, 0.60);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--screen-margin);
+}
+
+.auth-modal {
+  background: var(--paper);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-hero);
+  width: 100%;
+  max-width: 380px;
+  padding: 28px 24px 24px;
+  position: relative;
+  font-family: var(--font-body);
+}
+
+/* Header */
+.auth-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.auth-modal-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.auth-modal-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  border-radius: var(--r-chip);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  transition: background 0.15s;
+}
+
+.auth-modal-close:hover {
+  background: var(--paper-2);
+  color: var(--ink);
+}
+
+/* Form fields */
+.auth-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.auth-modal-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.auth-modal-input {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper-2);
+  border: 1.5px solid transparent;
+  border-radius: var(--r-button);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.auth-modal-input:focus {
+  border-color: var(--c-blue);
+  background: var(--paper);
+}
+
+.auth-modal-input::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* Error message */
+.auth-modal-error {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c-red);
+  background: rgba(230, 30, 60, 0.07);
+  border-radius: var(--r-chip);
+  padding: 8px 10px;
+  margin-bottom: 12px;
+}
+
+/* Submit button */
+.auth-modal-submit {
+  width: 100%;
+  background: var(--c-blue);
+  color: var(--paper);
+  border: none;
+  border-radius: var(--r-button);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  padding: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.auth-modal-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.auth-modal-submit:not(:disabled):hover {
+  opacity: 0.88;
+}
+
+/* Loading spinner */
+.auth-modal-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: auth-spin 0.65s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes auth-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Divider */
+.auth-modal-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.auth-modal-divider::before,
+.auth-modal-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+/* Google OAuth button */
+.auth-modal-google {
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--r-button);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.15s;
+}
+
+.auth-modal-google:hover {
+  background: var(--paper-2);
+}
+
+.auth-modal-google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Mode toggle */
+.auth-modal-toggle {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.auth-modal-toggle-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c-blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auth-modal-toggle-btn:hover {
+  color: var(--c-violet);
+}

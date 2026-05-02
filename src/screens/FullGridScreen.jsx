@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import TabBar from '../components/TabBar.jsx';
 import FilterChip from '../components/FilterChip.jsx';
-import { TEAMS, getTeamAccent } from '../data.js';
+import { TEAMS, STICKERS_PER_TEAM, getTeamAccent } from '../data.js';
 import { t } from '../i18n.js';
-
-const STICKERS_PER_TEAM = 18;
 
 function buildAllStickers(collection) {
   return TEAMS.map(team => {

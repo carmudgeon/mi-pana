@@ -3,7 +3,7 @@ import Hero from '../components/Hero.jsx';
 import QuickAction from '../components/QuickAction.jsx';
 import TeamRow from '../components/TeamRow.jsx';
 import TabBar from '../components/TabBar.jsx';
-import { TEAMS } from '../data.js';
+import { TEAMS, STICKERS_PER_TEAM } from '../data.js';
 import { t } from '../i18n.js';
 
 const CONFEDS = [
@@ -42,17 +42,17 @@ function getHeroPhrase(lang, pct, trades, userName) {
   return { phrase: t(lang, 'heroPhrase0', userName), em: t(lang, 'heroPhrase0em') };
 }
 
-export default function AlbumOverviewScreen({ collection, setSticker, lang, userName, trades = [], onSelectTeam, onNavigate }) {
+export default function AlbumOverviewScreen({ collection, setSticker, lang, userName, trades = [], onSelectTeam, onNavigate, isGuest = false, onSignInClick }) {
   const [search, setSearch] = useState('');
   const [confedFilter, setConfedFilter] = useState('ALL');
 
   const teamStats = TEAMS.map(team => {
     let owned = 0;
-    for (let i = 1; i <= 18; i++) {
+    for (let i = 1; i <= STICKERS_PER_TEAM; i++) {
       const id = `${team.code}-${String(i).padStart(2, '0')}`;
       if ((collection[id] || 0) >= 1) owned++;
     }
-    return { team, owned, total: 18 };
+    return { team, owned, total: STICKERS_PER_TEAM };
   });
 
   const totalOwned = teamStats.reduce((sum, ts) => sum + ts.owned, 0);
@@ -68,7 +68,7 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
     .sort((a, b) => (b.owned / b.total) - (a.owned / a.total));
 
   const handleToggleTeam = (teamCode, markAll) => {
-    for (let i = 1; i <= 18; i++) {
+    for (let i = 1; i <= STICKERS_PER_TEAM; i++) {
       const id = `${teamCode}-${String(i).padStart(2, '0')}`;
       if (markAll) {
         if ((collection[id] || 0) < 1) setSticker(id, 1);
@@ -106,10 +106,45 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
         eyebrow={t(lang, 'albumEyebrow')} completedLabel={t(lang, 'completed')}
         {...getHeroPhrase(lang, pct, trades.length, userName)} />
 
+      {/* Sign-in CTA — only shown to guest users (Requirements 3.1, 3.2) */}
+      {isGuest && (
+        <button
+          onClick={onSignInClick}
+          style={{
+            margin: '0 var(--screen-margin) 12px',
+            width: 'calc(100% - 2 * var(--screen-margin, 18px))',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 10,
+            background: 'linear-gradient(135deg, var(--c-blue), #3056c8)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 'var(--r-card)',
+            padding: '12px 16px',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+          aria-label="Sign in to sync and back up your collection"
+        >
+          <div>
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 14, letterSpacing: '-0.005em' }}>
+              Sync &amp; Back Up
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.85, marginTop: 2 }}>
+              Sign in to save your collection across devices
+            </div>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+      )}
+
       <div style={{ margin: '0 var(--screen-margin)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
         <QuickAction glyph="✓✓" label={t(lang, 'addAction')} color="var(--c-red)" onClick={() => {
           TEAMS.forEach(team => {
-            for (let i = 1; i <= 18; i++) {
+            for (let i = 1; i <= STICKERS_PER_TEAM; i++) {
               const id = `${team.code}-${String(i).padStart(2, '0')}`;
               if (!(collection[id] >= 1)) setSticker(id, 1);
             }

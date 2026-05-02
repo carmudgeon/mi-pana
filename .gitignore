@@ -4,3 +4,7 @@ dist/
 *.log
 .vscode/
 .idea/
+
+# Local environment variables — never commit real credentials
+.env.local
+.env.*.local

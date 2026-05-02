@@ -206,60 +206,11 @@ export default function useSupabaseSync(key, defaultValue, options = {}) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // ── 4. Realtime subscription (Req 12.1, 12.2, 12.3) ─────────────────────────
-  useEffect(() => {
-    if (!user) return; // no session — no Realtime (Req 12.3)
-
-    // Debounce the re-fetch so rapid successive DB changes don't cause a
-    // request storm (e.g. bulk mark-all writes fire many row events at once).
-    let refetchTimer = null;
-
-    const handleChange = () => {
-      if (refetchTimer) clearTimeout(refetchTimer);
-      refetchTimer = setTimeout(() => {
-        supabase
-          .from('collections')
-          .select('sticker_id, quantity')
-          .eq('user_id', user.id)
-          .then(({ data, error }) => {
-            if (error || !data) return;
-            const remote = rowsToCollection(data);
-            const local = stateRef.current;
-            const merged = applyMerge(local, remote);
-
-            // Only update state if the remote data actually differs from local.
-            // This breaks the upsert → change → re-fetch → upsert loop.
-            if (JSON.stringify(merged) === JSON.stringify(local)) return;
-
-            // Write merged state to localStorage and React state only —
-            // do NOT upsert back to Supabase here to avoid the feedback loop.
-            writeLocalStorage(merged);
-            setStateInternal(merged);
-          });
-      }, 500); // wait 500 ms for burst of row events to settle
-    };
-
-    const channelName = `collections:${user.id}:${key}`;
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'collections',
-          filter: `user_id=eq.${user.id}`,
-        },
-        handleChange,
-      )
-      .subscribe();
-
-    return () => {
-      if (refetchTimer) clearTimeout(refetchTimer);
-      supabase.removeChannel(channel);
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, key]);
+  // ── 4. Realtime subscription — disabled to prevent request storms ────────────
+  // Postgres Changes fires on our own upserts too, causing a feedback loop:
+  // upsert → change event → re-fetch → state update → re-render → upsert...
+  // Cross-device sync works on page load via the mount-sync effect above.
+  // TODO: re-enable with origin tracking to distinguish local vs remote writes.
 
   // ── 5. Online event → flush SyncQueue (Req 4.7, 11.2, 11.3) ─────────────────
   useEffect(() => {

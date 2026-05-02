@@ -210,40 +210,52 @@ export default function useSupabaseSync(key, defaultValue, options = {}) {
   useEffect(() => {
     if (!user) return; // no session — no Realtime (Req 12.3)
 
-    // Listen to Postgres Changes on the collections table for this user.
-    // This fires whenever another device upserts a row, giving us real-time
-    // cross-device sync without needing to broadcast manually.
+    // Debounce the re-fetch so rapid successive DB changes don't cause a
+    // request storm (e.g. bulk mark-all writes fire many row events at once).
+    let refetchTimer = null;
+
+    const handleChange = () => {
+      if (refetchTimer) clearTimeout(refetchTimer);
+      refetchTimer = setTimeout(() => {
+        supabase
+          .from('collections')
+          .select('sticker_id, quantity')
+          .eq('user_id', user.id)
+          .then(({ data, error }) => {
+            if (error || !data) return;
+            const remote = rowsToCollection(data);
+            const local = stateRef.current;
+            const merged = applyMerge(local, remote);
+
+            // Only update state if the remote data actually differs from local.
+            // This breaks the upsert → change → re-fetch → upsert loop.
+            if (JSON.stringify(merged) === JSON.stringify(local)) return;
+
+            // Write merged state to localStorage and React state only —
+            // do NOT upsert back to Supabase here to avoid the feedback loop.
+            writeLocalStorage(merged);
+            setStateInternal(merged);
+          });
+      }, 500); // wait 500 ms for burst of row events to settle
+    };
+
     const channelName = `collections:${user.id}:${key}`;
     const channel = supabase
       .channel(channelName)
       .on(
         'postgres_changes',
         {
-          event: '*',           // INSERT, UPDATE, DELETE
+          event: '*',
           schema: 'public',
           table: 'collections',
           filter: `user_id=eq.${user.id}`,
         },
-        () => {
-          // Re-fetch the full collection on any change rather than trying to
-          // apply individual row diffs — simpler and avoids partial-state bugs.
-          supabase
-            .from('collections')
-            .select('sticker_id, quantity')
-            .eq('user_id', user.id)
-            .then(({ data, error }) => {
-              if (error || !data) return;
-              const remote = rowsToCollection(data);
-              const local = stateRef.current;
-              const merged = applyMerge(local, remote);
-              writeLocalStorage(merged);
-              setStateInternal(merged);
-            });
-        },
+        handleChange,
       )
       .subscribe();
 
     return () => {
+      if (refetchTimer) clearTimeout(refetchTimer);
       supabase.removeChannel(channel);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

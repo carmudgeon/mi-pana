@@ -55,9 +55,11 @@ vi.mock('../lib/SyncQueue.js', () => {
 // ---------------------------------------------------------------------------
 
 function makeMockLocalStorage() {
-  const store = {};
+  // Use Object.create(null) so keys like "__proto__" are stored as own
+  // properties and don't pollute Object.prototype.
+  const store = Object.create(null);
   return {
-    getItem: vi.fn((key) => (key in store ? store[key] : null)),
+    getItem: vi.fn((key) => (Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null)),
     setItem: vi.fn((key, value) => { store[key] = value; }),
     removeItem: vi.fn((key) => { delete store[key]; }),
     clear: vi.fn(() => { Object.keys(store).forEach((k) => delete store[k]); }),
@@ -183,7 +185,10 @@ const collectionArb = fc.dictionary(
   fc.integer({ min: 0, max: 10 }),
 );
 
-const keyArb = fc.string({ minLength: 1, maxLength: 30 }).filter((s) => s.trim().length > 0);
+const keyArb = fc.string({ minLength: 1, maxLength: 30 })
+  .filter((s) => s.trim().length > 0)
+  // Exclude keys that would pollute Object.prototype or break JSON round-trips
+  .filter((s) => s !== '__proto__' && s !== 'constructor' && s !== 'prototype');
 
 const userArb = fc.record({
   id: fc.uuid(),

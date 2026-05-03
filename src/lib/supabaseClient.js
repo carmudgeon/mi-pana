@@ -10,4 +10,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // Use localStorage for session persistence (default) but with a safe
+    // storage key that avoids collisions with other Supabase projects.
+    storageKey: 'mi-pana-auth',
+    // Automatically refresh the token before it expires.
+    autoRefreshToken: true,
+    // Persist the session across page reloads.
+    persistSession: true,
+    // Detect the session from the URL hash after OAuth redirects.
+    detectSessionInUrl: true,
+  },
+});

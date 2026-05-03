@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import useSupabaseSync from './hooks/useSupabaseSync.js';
-import { mergeCollections } from './utils/mergeCollections.js';
+import { useState } from 'react';
+import useCollection from './hooks/useCollection.js';
 import { useAuth } from './context/useAuth.js';
 import AlbumOverviewScreen from './screens/AlbumOverviewScreen.jsx';
 import TeamDetailScreen from './screens/TeamDetailScreen.jsx';
@@ -10,23 +9,13 @@ import AuthModal from './components/AuthModal.jsx';
 
 export default function App() {
   const { user } = useAuth();
-  const [collection, setCollection] = useSupabaseSync('panini2026-collection', {}, { mergeFn: mergeCollections });
-  const [trades, setTrades] = useSupabaseSync('panini2026-trades', []);
+  const { collection, setSticker, loading } = useCollection();
+  const [trades, setTrades] = useState([]);
   const [view, setView] = useState('home');
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const lang = 'es';
   const userName = user?.user_metadata?.username ?? user?.email?.split('@')[0] ?? 'Panita';
-
-  const setSticker = (id, qty) => {
-    setCollection(prev => {
-      const next = { ...prev };
-      // Soft-delete: keep the key with quantity 0 so Supabase stays in sync.
-      // The local collection object uses 0 to mean "not owned".
-      next[id] = Math.max(0, qty);
-      return next;
-    });
-  };
 
   const addTrade = (proposal) => {
     const trade = {
@@ -39,17 +28,13 @@ export default function App() {
   };
 
   const acceptTrade = (trade) => {
-    setCollection(prev => {
-      const next = { ...prev };
-      for (const id of trade.canGive) {
-        const qty = next[id] || 0;
-        if (qty >= 2) next[id] = qty - 1;
-      }
-      for (const id of trade.canGet) {
-        next[id] = (next[id] || 0) + 1;
-      }
-      return next;
-    });
+    for (const id of trade.canGive) {
+      const qty = collection[id] || 0;
+      if (qty >= 2) setSticker(id, qty - 1);
+    }
+    for (const id of trade.canGet) {
+      setSticker(id, (collection[id] || 0) + 1);
+    }
     setTrades(prev => prev.filter(t => t.id !== trade.id));
   };
 
@@ -67,6 +52,19 @@ export default function App() {
     setSelectedTeam(team);
     setView('team');
   };
+
+  // Show a minimal loading state while fetching from Supabase
+  if (loading) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'grid', placeItems: 'center',
+        background: '#fff', fontFamily: 'var(--font-body)',
+        color: 'var(--muted)', fontSize: 13,
+      }}>
+        Cargando…
+      </div>
+    );
+  }
 
   if (view === 'team' && selectedTeam) {
     return (

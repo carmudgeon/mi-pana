@@ -32,8 +32,9 @@ export default function useCollection() {
   const [collection, setCollectionState] = useState({});
   const [loading, setLoading] = useState(true);
   const debounceRef = useRef(null);
-  const latestRef = useRef({});
-  latestRef.current = collection;
+  // Always keep a ref to the latest user so persist() never has a stale closure
+  const userRef = useRef(user);
+  userRef.current = user;
 
   // Fetch from Supabase on mount / user change
   useEffect(() => {
@@ -60,19 +61,24 @@ export default function useCollection() {
     debounceRef.current = setTimeout(async () => {
       const rows = collectionToRows(next, userId);
       if (rows.length === 0) return;
-      await supabase
+      const { error } = await supabase
         .from('collections')
         .upsert(rows, { onConflict: 'user_id,sticker_id', ignoreDuplicates: false });
+      if (error) {
+        // Surface upsert errors so they're visible in DevTools console
+        console.error('[useCollection] upsert failed:', error.message, error);
+      }
     }, DEBOUNCE_MS);
   }, []);
 
   const setSticker = useCallback((id, qty) => {
     setCollectionState(prev => {
       const next = { ...prev, [id]: Math.max(0, qty) };
-      if (user) persist(next, user.id);
+      const currentUser = userRef.current;
+      if (currentUser) persist(next, currentUser.id);
       return next;
     });
-  }, [user, persist]);
+  }, [persist]);
 
   // Cleanup on unmount
   useEffect(() => () => {

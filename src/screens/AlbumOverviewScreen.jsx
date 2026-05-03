@@ -65,7 +65,7 @@ export default function AlbumOverviewScreen({ collection, setSticker, lang, user
       if (search && !team.name.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     })
-    .sort((a, b) => (b.owned / b.total) - (a.owned / a.total));
+    .sort((a, b) => a.team.group.localeCompare(b.team.group));
 
   const handleToggleTeam = (teamCode, markAll) => {
     for (let i = 1; i <= STICKERS_PER_TEAM; i++) {

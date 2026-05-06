@@ -40,6 +40,10 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
     .map(g => ({ ...g, stickers: g.stickers.filter(filterSticker) }))
     .filter(g => g.stickers.length > 0);
 
+  if (filter === 'miss') {
+    visibleGroups.sort((a, b) => a.team.group.localeCompare(b.team.group));
+  }
+
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ padding: '6px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

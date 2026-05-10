@@ -62,3 +62,21 @@
   padding: 20px 0;
   text-align: center;
 }
+
+@media print {
+  @page { size: letter; margin: 12mm; }
+
+  body * { visibility: hidden; }
+  .printable-missing,
+  .printable-missing * { visibility: visible; }
+
+  .printable-missing {
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    color: #000;
+    background: #fff;
+  }
+}

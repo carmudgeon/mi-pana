@@ -88,6 +88,8 @@ const strings = {
     heroFirstTradeem: 'Primer trueque',
     proposeGiveOnly: 'Regalar cromos',
     proposeGetOnly: 'Pedir cromos',
+    print: 'Imprimir',
+    missingPrintTitle: 'Mi Pana 26 · Faltantes',
   },
   en: {
     greeting: 'Hey,',
@@ -178,6 +180,8 @@ const strings = {
     heroFirstTrade: (name) => `First trade proposed, ${name}!`,
     heroFirstTradeem: 'First trade',
     proposeGetOnly: 'Request stickers',
+    print: 'Print',
+    missingPrintTitle: 'Mi Pana 26 · Missing',
   },
 };
 

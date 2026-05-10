@@ -225,8 +225,8 @@ export default function PrintableMissingList({ collection, lang }) {
     <div className="printable-missing">
       <header className="printable-missing__header">
         <span className="printable-missing__title">{t(lang, 'missingPrintTitle')}</span>
-        <span className="printable-missing__count">{totalOwned} / {totalAll}</span>
-        <span className="printable-missing__date">{formatDate(lang)}</span>
+        <span>{totalOwned} / {totalAll}</span>
+        <span>{formatDate(lang)}</span>
       </header>
 
       {entries.length === 0 ? (

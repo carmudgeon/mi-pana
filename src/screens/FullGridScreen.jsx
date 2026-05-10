@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TabBar from '../components/TabBar.jsx';
 import FilterChip from '../components/FilterChip.jsx';
+import PrintableMissingList from '../components/PrintableMissingList.jsx';
 import { TEAMS, STICKERS_PER_TEAM, getTeamAccent } from '../data.js';
 import { t } from '../i18n.js';
 
@@ -47,7 +48,7 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
   return (
     <div className="screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <div style={{ padding: '6px 16px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <button onClick={onBack} style={{
+        <button onClick={onBack} className="no-print" style={{
           background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--r-pill)',
           padding: '6px 12px', color: 'var(--ink)', fontWeight: 700, fontSize: 10,
           fontFamily: 'var(--font-mono)', letterSpacing: '0.14em', textTransform: 'uppercase',
@@ -62,8 +63,27 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
         <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 22, letterSpacing: '-0.01em' }}>
           {t(lang, 'fullGrid')}
         </h2>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', marginTop: 4, letterSpacing: '0.04em' }}>
-          {counts.miss > 0 ? t(lang, 'missingCount', counts.miss) : t(lang, 'albumComplete')}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginTop: 4,
+        }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--muted)', letterSpacing: '0.04em' }}>
+            {counts.miss > 0 ? t(lang, 'missingCount', counts.miss) : t(lang, 'albumComplete')}
+          </div>
+          {filter === 'miss' && counts.miss > 0 && (
+            <button
+              className="no-print"
+              onClick={() => window.print()}
+              style={{
+                background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--r-pill)',
+                padding: '6px 12px', color: 'var(--ink)', fontWeight: 700, fontSize: 10,
+                fontFamily: 'var(--font-mono)', letterSpacing: '0.14em', textTransform: 'uppercase',
+                cursor: 'pointer',
+              }}
+            >
+              {t(lang, 'print')}
+            </button>
+          )}
         </div>
       </div>
 
@@ -158,6 +178,8 @@ export default function FullGridScreen({ collection, setSticker, lang, onBack, o
           );
         })}
       </div>
+
+      <PrintableMissingList collection={collection} lang={lang} />
 
       <TabBar active="home" onNavigate={onNavigate} />
     </div>

@@ -1,0 +1,62 @@
+.printable-missing { display: none; }
+
+.printable-missing__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 10pt;
+  font-weight: 700;
+  border-bottom: 1px solid #000;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.printable-missing__title {
+  font-family: var(--font-display, var(--font-body));
+  font-weight: 800;
+  font-size: 12pt;
+  letter-spacing: -0.005em;
+}
+
+.printable-missing__matrix {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  row-gap: 8px;
+}
+
+.printable-missing__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.printable-missing__code {
+  font-family: var(--font-mono);
+  font-size: 10pt;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  border: 1px solid #000;
+  padding: 1px 4px;
+  color: #000;
+  background: #fff;
+}
+
+.printable-missing__num {
+  font-family: var(--font-mono);
+  font-size: 10pt;
+  font-weight: 600;
+  padding: 1px 2px;
+  color: #000;
+}
+
+.printable-missing__empty {
+  font-family: var(--font-mono);
+  font-size: 11pt;
+  color: #000;
+  padding: 20px 0;
+  text-align: center;
+}

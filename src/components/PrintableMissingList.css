@@ -31,6 +31,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  /* Wrap only when a single country's numbers exceed the page width;
+     country blocks normally stay together as one inline unit. */
   flex-wrap: wrap;
 }
 

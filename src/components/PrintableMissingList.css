@@ -22,7 +22,8 @@
 
 .printable-missing__matrix {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  column-gap: 12px;
   row-gap: 8px;
 }
 
